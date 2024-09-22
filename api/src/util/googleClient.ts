@@ -1,5 +1,5 @@
 import { google } from "googleapis";
-const fs = require("fs");
+import fs from "fs";
 import type { levelType } from "../../../types";
 export class googleClient {
 	credentials_file: string;
@@ -7,7 +7,7 @@ export class googleClient {
 	sheets: any;
 	spreadsheet_id: string;
 	fetchAllLevels: () => any;
-	fetchSingleLevel: (index: number) => any;
+	fetchSingleLevelByIndex: (index: number) => any;
 	constructor() {
 		this.credentials_file = "credentials.json";
 		this.scopes = ["https://www.googleapis.com/auth/spreadsheets.readonly"];
@@ -31,7 +31,7 @@ export class googleClient {
 				return [];
 			}
 		};
-		this.fetchSingleLevel = async (index: number) => {
+		this.fetchSingleLevelByIndex = async (index: number) => {
 			const auth = new google.auth.GoogleAuth({
 				keyFile: this.credentials_file,
 				scopes: this.scopes,
@@ -60,7 +60,7 @@ function parseTimeToFloat(time: string) {
 const jsonifyLevelData = (data: string[][]) => {
 	const level_array: levelType[] = data.map((row) => ({
 		name: row[0],
-		id: "none",
+		id: row[5],
 		demons: parseInt(row[1]),
 		record_time: parseTimeToFloat(row[2]),
 		chapter: parseInt(row[3]),

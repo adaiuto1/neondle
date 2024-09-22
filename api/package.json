@@ -1,25 +1,27 @@
 {
-  "name": "api",
-  "version": "1.0.0",
-  "main": "index.js",
-  "scripts": {
-    "start": "nodemon"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
-  "dependencies": {
-    "express": "^4.21.0",
-    "googleapis": "^144.0.0",
-    "sjcl": "^1.0.8"
-  },
-  "devDependencies": {
-    "@types/express": "^4.17.21",
-    "@types/node": "^22.5.5",
-    "@types/sjcl": "^1.0.34",
-    "nodemon": "^3.1.7",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.6.2"
-  }
+	"name": "api",
+	"version": "1.0.0",
+	"main": "index.js",
+	"scripts": {
+		"start": "nodemon"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"description": "",
+	"dependencies": {
+		"express": "^4.21.0",
+		"googleapis": "^144.0.0",
+		"sjcl": "^1.0.8"
+	},
+	"devDependencies": {
+		"@types/express": "^4.17.21",
+		"@types/node": "^22.5.5",
+		"@types/sjcl": "^1.0.34",
+		"nodemon": "^3.1.7",
+		"ts-node": "^10.9.2",
+		"typescript": "^5.6.2"
+	},
+	"resolveJsonModule": true,
+	"esModuleInterop": true
 }

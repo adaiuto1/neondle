@@ -7,3 +7,11 @@ export type levelType = {
 	record_time: number;
 	record_date: string;
 };
+export type guesserResultType = {
+	guessed_level: levelType;
+	name: boolean;
+	chapter: "high" | "equal" | "low";
+	demons: "high" | "equal" | "low";
+	record_time: "high" | "equal" | "low";
+	record_date: "high" | "equal" | "low";
+};
