@@ -32,6 +32,14 @@ export class googleClient {
 			}
 		};
 		this.fetchSingleLevelByIndex = async (index: number) => {
+			let level_index = index;
+			if (level_index === 32) {
+				level_index = 34;
+			} else if (level_index === 84) {
+				level_index = 64;
+			} else if (level_index === 96) {
+				level_index = 56;
+			}
 			const auth = new google.auth.GoogleAuth({
 				keyFile: this.credentials_file,
 				scopes: this.scopes,
@@ -39,7 +47,7 @@ export class googleClient {
 			try {
 				const response = await this.sheets.spreadsheets.values.get({
 					spreadsheetId: this.spreadsheet_id,
-					range: `Sheet1!A${index + 2}:G${index + 2}`,
+					range: `Sheet1!A${level_index + 2}:G${level_index + 2}`,
 					auth,
 				});
 				const values = response.data.values;

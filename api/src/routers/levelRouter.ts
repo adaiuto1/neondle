@@ -28,7 +28,7 @@ levelRouter.get("/clue/random", async (req, res) => {
 	return res.send(level);
 });
 levelRouter.get("/clue/random/silly", async (req, res) => {
-	const level_index = getRandomLevelIndex(true);
+	const level_index = 84;
 	const level = await client.fetchSingleLevelByIndex(level_index);
 	return res.send(level);
 });
