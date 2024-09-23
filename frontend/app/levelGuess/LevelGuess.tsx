@@ -133,7 +133,10 @@ export default function LevelGuess({
 								<MenuButton
 									as={Button}
 									rightIcon={<ChevronDownIcon />}
-									isDisabled={results.length > 0 && !game_finished}
+									isDisabled={
+										(results.length > 0 && !game_finished) ||
+										target === "loading"
+									}
 								>
 									{sillyMode ? "Hard Mode" : "Normal Mode"}
 								</MenuButton>
