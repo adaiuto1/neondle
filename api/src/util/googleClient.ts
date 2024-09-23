@@ -67,13 +67,13 @@ function parseTimeToFloat(time: string) {
 }
 const jsonifyLevelData = (data: string[][]) => {
 	const level_array: levelType[] = data.map((row) => ({
-		name: row[0],
 		id: row[5],
+		name: row[0],
+		chapter: parseInt(row[3]),
 		demons: parseInt(row[1]),
 		record_time: parseTimeToFloat(row[2]),
-		chapter: parseInt(row[3]),
-		id_difficulty: "easy",
 		record_date: row[4].toString(),
+		id_difficulty: row[6],
 	}));
 	const level_json = JSON.stringify(level_array, null, 2);
 	return level_json;

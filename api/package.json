@@ -10,11 +10,13 @@
 	"license": "ISC",
 	"description": "",
 	"dependencies": {
+		"cors": "^2.8.5",
 		"express": "^4.21.0",
 		"googleapis": "^144.0.0",
 		"sjcl": "^1.0.8"
 	},
 	"devDependencies": {
+		"@types/cors": "^2.8.17",
 		"@types/express": "^4.17.21",
 		"@types/node": "^22.5.5",
 		"@types/sjcl": "^1.0.34",
