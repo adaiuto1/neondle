@@ -70,6 +70,7 @@ export default function LevelGuess({
 
 	useEffect(() => {
 		setResults([]);
+		setTarget("loading");
 		loadData();
 	}, [sillyMode]);
 
