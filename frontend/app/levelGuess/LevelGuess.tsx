@@ -82,7 +82,7 @@ export default function LevelGuess({
 			)
 		) {
 			const guess_target = await axios
-				.get(`http://54.211.207.169:8000/levels/name/${input}`)
+				.get(`http://54.211.207.169:8000/levels/name/${input.toLowerCase()}`)
 				.then((x) => {
 					return x.data[0];
 				})
