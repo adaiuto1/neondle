@@ -78,7 +78,7 @@ export default function LevelGuess({
 		setAwaitingResponse(true);
 		if (!results.some((x) => x.guessed_level.name.toLowerCase() === input)) {
 			const guess_target = await axios
-				.get(`http://localhost:8000/levels/name/${input}`)
+				.get(`http://54.211.207.169:8000/levels/name/${input}`)
 				.then((x) => {
 					return x.data[0];
 				})
