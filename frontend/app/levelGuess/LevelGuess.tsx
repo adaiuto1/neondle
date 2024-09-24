@@ -19,8 +19,8 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import type { guesserResultType, levelType } from "@/types";
-import { getTodaysLevel } from "./utils/client";
-import axios from "axios";
+import { getLevelByName, getTodaysLevel } from "./utils/client";
+import axios, { AxiosError } from "axios";
 import GuessBox from "./components/GuessBox";
 import { getResult, validateGuess } from "./utils/guessHandler";
 import {
@@ -32,6 +32,7 @@ import GuessResultsList from "./components/GuessResultsList";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 
 import GameModeInfoButton from "./components/GameModeInfoButton";
+import { API_URL } from "../page";
 
 export default function LevelGuess({
 	defaultSillyMode,
@@ -60,13 +61,15 @@ export default function LevelGuess({
 
 	const loadData = async () => {
 		handlePreviousSession(setResults, !!sillyMode);
-		const todays_level = await getTodaysLevel(!!sillyMode);
-		if (!!todays_level) {
-			setTarget(todays_level);
-		} else {
+		const { level, error } = await getTodaysLevel(!!sillyMode);
+		if (!!level) {
+			setTarget(level);
+		} else if (error) {
 			toast({
-				title: "Error",
-				description: `Could not connect to server`,
+				title: "Server Error",
+				description: error.message,
+				colorScheme: "red",
+				position: "top",
 			});
 		}
 	};
@@ -82,22 +85,18 @@ export default function LevelGuess({
 		const { is_valid, message } = validateGuess(input, results, !!sillyMode);
 
 		if (is_valid) {
-			const guess_target = await axios
-				.get(`http://54.211.207.169:8000/levels/name/${input.toLowerCase()}`)
-				.then((x) => {
-					return x.data[0];
-				})
-				.catch((err) => {
-					toast({
-						title: "Error",
-						description: `Could not connect to server: ${err}`,
-					});
-					return;
-				});
-
-			if (target !== "loading") {
-				const result = getResult(guess_target, target);
+			const { level, error } = await getLevelByName(input.toLowerCase());
+			if (!!level && target !== "loading") {
+				const result = getResult(level, target);
 				addResult(result);
+			} else if (error) {
+				toast({
+					title:
+						error.status === 500 ? "Internal Server Error" : "Invalid Guess",
+					...(error.status === 500 ? { description: error.message } : {}),
+					colorScheme: error.status === 500 ? "red" : "orange",
+					position: "top",
+				});
 			}
 		} else {
 			toast({

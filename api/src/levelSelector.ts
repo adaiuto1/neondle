@@ -15,15 +15,11 @@ export const getRandomLevelIndex = (include_silly: boolean) => {
 	const level_index = Math.floor(Math.random() * num_options);
 	return level_index;
 };
-export const getLevelIndexById = (level_id: string): number | null => {
-	if (level_id_list.includes(level_id)) {
-		const level_index = level_id_list.indexOf(level_id);
-		return level_index;
-	} else {
-		return null;
-	}
+export const getLevelIndexById = (level_id: string): number => {
+	const level_index = level_id_list.indexOf(level_id);
+	return level_index;
 };
-export const getLevelIndexByName = (name: string): string | null => {
+export const getLevelIdByName = (name: string): string | null => {
 	if (Object(level_id_mapping).hasOwnProperty(name)) {
 		console.log(Object(level_id_mapping)[name]);
 		return Object(level_id_mapping)[name];

@@ -2,7 +2,7 @@ import express from "express";
 import { googleClient } from "../util/googleClient";
 import {
 	getLevelIndexById,
-	getLevelIndexByName,
+	getLevelIdByName,
 	getRandomLevelIndex,
 	getTodaysLevelIndex,
 } from "../levelSelector";
@@ -58,21 +58,18 @@ levelRouter.get("/id/:level_id", async (req, res) => {
 });
 levelRouter.get("/name/:level_name", async (req, res) => {
 	const { level_name } = req.params;
-	if (!!level_name) {
-		const level_id = getLevelIndexByName(level_name);
-		if (!!level_id) {
-			const level_index = getLevelIndexById(level_id);
-			if (level_index !== null) {
-				const level = await client.fetchSingleLevelByIndex(level_index);
-				return res.send(level);
-			} else {
-				return res.status(404).send(`Invalid level_id: ${level_id}`);
-			}
-		} else {
-			return res.status(404).send(`Invalid level_name: ${level_name}`);
-		}
-	} else {
-		return res.status(400).send("No level_name provided");
+	if (!level_name) return res.status(400).send("No level_name provided");
+
+	const level_id = getLevelIdByName(level_name);
+	if (!level_id)
+		return res.status(404).send(`Couldn't resolve level_id for ${level_name}`);
+	const level_index = getLevelIndexById(level_id);
+	const level = await client.fetchSingleLevelByIndex(level_index);
+	if (!level) {
+		return res
+			.status(500)
+			.send(`Invalid index resolved for ${level_name}: ${level_index}`);
 	}
+	return res.status(200).send(level);
 });
 export { levelRouter };

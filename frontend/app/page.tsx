@@ -1,6 +1,6 @@
 import Neondle from "./Neondle";
 import { Box, ChakraProvider } from "@chakra-ui/react";
-
+export const API_URL = `http://localhost:8000`;
 export default function Home() {
 	return (
 		<ChakraProvider>

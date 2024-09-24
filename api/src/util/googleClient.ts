@@ -33,13 +33,6 @@ export class googleClient {
 		};
 		this.fetchSingleLevelByIndex = async (index: number) => {
 			let level_index = index;
-			if (level_index === 32) {
-				level_index = 34;
-			} else if (level_index === 84) {
-				level_index = 64;
-			} else if (level_index === 96) {
-				level_index = 56;
-			}
 			const auth = new google.auth.GoogleAuth({
 				keyFile: this.credentials_file,
 				scopes: this.scopes,

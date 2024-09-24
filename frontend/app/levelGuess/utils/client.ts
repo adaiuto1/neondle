@@ -1,19 +1,54 @@
+import { API_URL } from "@/app/page";
 import { levelType } from "@/types";
-import axios from "axios";
+import axios, { AxiosError, AxiosResponse } from "axios";
+interface levelResponseType {
+	level?: levelType;
+	error?: {
+		status: number;
+		message: string;
+	};
+}
 export const getTodaysLevel = async (
 	silly_mode: boolean
-): Promise<levelType> => {
-	const response = await axios
+): Promise<levelResponseType> => {
+	const guess_target: levelResponseType = await axios
 		.get(
-			`http://54.211.207.169:8000/levels/clue/today${
+			`${API_URL}/levels/clue/today${
 				!!silly_mode ? "/silly" : ""
 			}?date=${new Date().toLocaleDateString()}`
 		)
-		.then((x) => {
-			return x.data[0];
+		.then((x: AxiosResponse) => {
+			return { level: x.data[0] as levelType };
 		})
-		.catch(() => {
-			return null;
+		.catch((err: AxiosError) => {
+			return {
+				error: {
+					status: err.status || 500,
+					message: err.response?.data
+						? JSON.stringify(err.response?.data).toString()
+						: "Lost connection to server. Try again later.",
+				},
+			};
 		});
-	return response;
+	return guess_target;
+};
+export const getLevelByName = async (
+	level_name: string
+): Promise<levelResponseType> => {
+	const guess_target: levelResponseType = await axios
+		.get(`${API_URL}/levels/name/${level_name.toLowerCase()}`)
+		.then((x: AxiosResponse) => {
+			return { level: x.data[0] as levelType };
+		})
+		.catch((err: AxiosError) => {
+			return {
+				error: {
+					status: err.status || 500,
+					message: err.response?.data
+						? JSON.stringify(err.response?.data).toString()
+						: "Lost Connection to Server",
+				},
+			};
+		});
+	return guess_target;
 };

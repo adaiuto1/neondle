@@ -47,7 +47,7 @@ export const validateGuess = (
 		if (silly_mode_levels.some((x) => x === input.toLowerCase())) {
 			return {
 				is_valid: false,
-				message: `Boss Fights & Ch 11 are not part of Normal Mode`,
+				message: `Sidequests & Chapter 11 are not part of Normal Mode`,
 			};
 		}
 	}
@@ -80,7 +80,6 @@ export const getResult = (
 	guessed_level: levelType,
 	target_level: levelType
 ): guesserResultType => {
-	console.log(target_level);
 	const name_result = guessed_level.name === target_level.name;
 	const chapter_result = () => {
 		if (guessed_level.chapter > target_level.chapter) {
