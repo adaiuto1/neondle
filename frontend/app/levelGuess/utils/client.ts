@@ -15,7 +15,7 @@ export const getTodaysLevel = async (
 		.get(
 			`${API_URL}/levels/clue/today${
 				!!silly_mode ? "/silly" : ""
-			}?date=${new Date().toLocaleDateString()}`
+			}?date=${new Date().toLocaleDateString("en-US")}`
 		)
 		.then((x: AxiosResponse) => {
 			return { level: x.data[0] as levelType };
