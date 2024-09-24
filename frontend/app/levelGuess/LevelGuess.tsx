@@ -83,16 +83,20 @@ export default function LevelGuess({
 		const { is_valid, message } = validateGuess(input, results, !!sillyMode);
 
 		if (is_valid) {
-			const { level, error } = await getLevelByName(input.toLowerCase());
-			if (!!level && target !== "loading") {
-				const result = getResult(level, target);
+			const response = await getLevelByName(input.toLowerCase());
+			if (!!response.level && target !== "loading") {
+				const result = getResult(response.level, target);
 				addResult(result);
-			} else if (error) {
+			} else if (response.error) {
 				toast({
 					title:
-						error.status === 500 ? "Internal Server Error" : "Invalid Guess",
-					...(error.status === 500 ? { description: error.message } : {}),
-					colorScheme: error.status === 500 ? "red" : "orange",
+						response.error.status === 500
+							? "Internal Server Error"
+							: "Invalid Guess",
+					...(response.error.status === 500
+						? { description: response.error.message }
+						: {}),
+					colorScheme: response.error.status === 500 ? "red" : "orange",
 					position: "top",
 				});
 			}
