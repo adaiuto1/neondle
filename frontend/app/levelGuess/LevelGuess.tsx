@@ -20,7 +20,6 @@ import {
 import { useEffect, useState } from "react";
 import type { guesserResultType, levelType } from "@/types";
 import { getLevelByName, getTodaysLevel } from "./utils/client";
-import axios, { AxiosError } from "axios";
 import GuessBox from "./components/GuessBox";
 import { getResult, validateGuess } from "./utils/guessHandler";
 import {
@@ -32,7 +31,6 @@ import GuessResultsList from "./components/GuessResultsList";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 
 import GameModeInfoButton from "./components/GameModeInfoButton";
-import { API_URL } from "../page";
 
 export default function LevelGuess({
 	defaultSillyMode,

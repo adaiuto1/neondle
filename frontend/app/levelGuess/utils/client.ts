@@ -1,4 +1,4 @@
-import { API_URL } from "@/app/page";
+import { API_URL } from "@/app/Neondle";
 import { levelType } from "@/types";
 import axios, { AxiosError, AxiosResponse } from "axios";
 interface levelResponseType {
