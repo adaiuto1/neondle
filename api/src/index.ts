@@ -35,6 +35,6 @@ https
 		},
 		app
 	)
-	.listen(PORT, () => {
+	.listen(PORT, "0.0.0.0", () => {
 		console.log(`HTTPS server running on port ${PORT}`);
 	});

@@ -31,6 +31,6 @@ https_1.default
     key: fs_1.default.readFileSync("localhost-key.pem"),
     cert: fs_1.default.readFileSync("localhost.pem"),
 }, app)
-    .listen(PORT, () => {
+    .listen(PORT, "0.0.0.0", () => {
     console.log(`HTTPS server running on port ${PORT}`);
 });

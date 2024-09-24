@@ -43,6 +43,16 @@ export const validateGuess = (
 	results: guesserResultType[],
 	sillyMode: boolean
 ): { is_valid: boolean; message: string } => {
+	if (
+		input.toLowerCase() === "absolution" ||
+		input.toLowerCase() === "the third temple" ||
+		input.toLowerCase() === "the clocktower"
+	) {
+		return {
+			is_valid: false,
+			message: `Boss Fights are not part of Neondle`,
+		};
+	}
 	if (!sillyMode) {
 		if (silly_mode_levels.some((x) => x === input.toLowerCase())) {
 			return {
@@ -61,16 +71,6 @@ export const validateGuess = (
 			message: `You have already guessed ${
 				input.charAt(0).toUpperCase() + input.slice(1)
 			}`,
-		};
-	}
-	if (
-		input.toLowerCase() === "absolution" ||
-		input.toLowerCase() === "the third temple" ||
-		input.toLowerCase() === "the clocktower"
-	) {
-		return {
-			is_valid: false,
-			message: `Boss Fights are not part of Neondle`,
 		};
 	} else {
 		return { is_valid: true, message: "" };
