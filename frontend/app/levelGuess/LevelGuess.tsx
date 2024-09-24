@@ -22,7 +22,7 @@ import type { guesserResultType, levelType } from "@/types";
 import { getTodaysLevel } from "./utils/client";
 import axios from "axios";
 import GuessBox from "./components/GuessBox";
-import { getResult } from "./utils/guessHandler";
+import { getResult, validateGuess } from "./utils/guessHandler";
 import {
 	handlePreviousSession,
 	onWin,
@@ -64,7 +64,10 @@ export default function LevelGuess({
 		if (!!todays_level) {
 			setTarget(todays_level);
 		} else {
-			alert("Error in level response");
+			toast({
+				title: "Error",
+				description: `Could not connect to server`,
+			});
 		}
 	};
 
@@ -76,30 +79,33 @@ export default function LevelGuess({
 
 	const onGuess = async (input: string) => {
 		setAwaitingResponse(true);
-		if (
-			!results.some(
-				(x) => x.guessed_level.name.toLowerCase() === input.toLowerCase()
-			)
-		) {
+		const { is_valid, message } = validateGuess(input, results, !!sillyMode);
+
+		if (is_valid) {
 			const guess_target = await axios
-				.get(`http://54.211.207.169:8000/levels/name/${input.toLowerCase()}`)
+				.get(`http://localhost:8000/levels/name/${input.toLowerCase()}`)
 				.then((x) => {
 					return x.data[0];
 				})
-				.catch(() => {
-					return null;
-				});
-			if (target !== "loading") {
-				if (!!guess_target) {
-					const new_result = getResult(guess_target, target);
-					addResult(new_result);
-				} else {
+				.catch((err) => {
 					toast({
-						title: "Invalid Guess",
-						description: "Provided level name not found",
+						title: "Error",
+						description: `Could not connect to server: ${err}`,
 					});
-				}
+					return;
+				});
+
+			if (target !== "loading") {
+				const result = getResult(guess_target, target);
+				addResult(result);
 			}
+		} else {
+			toast({
+				title: "Invalid Guess",
+				colorScheme: "orange",
+				position: "top",
+				description: message,
+			});
 		}
 		setAwaitingResponse(false);
 	};

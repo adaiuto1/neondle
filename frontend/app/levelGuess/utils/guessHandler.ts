@@ -1,10 +1,81 @@
 import { guesserResultType, levelType } from "@/types";
-// guessed_level: levelType;
-// 	name: boolean;
-// 	chapter: "high" | "equal" | "low";
-// 	demons: "high" | "equal" | "low";
-// 	record_time: "high" | "equal" | "low";
-// 	record_date: "high" | "equal" | "low";
+export const silly_mode_levels = [
+	"spree",
+	"breakthrough",
+	"glide",
+	"closer",
+	"hike",
+	"switch",
+	"access",
+	"congregation",
+	"sequence",
+	"marathon",
+	"sacrifice",
+	"absolution",
+	"elevate traversal i",
+	"elevate traversal ii",
+	"purify traversal",
+	"godspeed traversal",
+	"stomp traversal",
+	"fireball traversal",
+	"dominion traversal",
+	"book of life traversal",
+	"doghouse",
+	"choker",
+	"chain",
+	"hellevator",
+	"razor",
+	"all seeing eye",
+	"resident saw i",
+	"resident saw ii",
+	"sunset flip powerbomb",
+	"balloon mountain",
+	"climbing gym",
+	"fisherman suplex",
+	"stf",
+	"arena",
+	"attitude adjustment",
+	"rocket",
+];
+
+export const validateGuess = (
+	input: string,
+	results: guesserResultType[],
+	sillyMode: boolean
+): { is_valid: boolean; message: string } => {
+	if (!sillyMode) {
+		if (silly_mode_levels.some((x) => x === input.toLowerCase())) {
+			return {
+				is_valid: false,
+				message: `Boss Fights & Ch 11 are not part of Normal Mode`,
+			};
+		}
+	}
+	if (
+		results.some(
+			(x) => x.guessed_level.name.toLowerCase() === input.toLowerCase()
+		)
+	) {
+		return {
+			is_valid: false,
+			message: `You have already guessed ${
+				input.charAt(0).toUpperCase() + input.slice(1)
+			}`,
+		};
+	}
+	if (
+		input.toLowerCase() === "absolution" ||
+		input.toLowerCase() === "the third temple" ||
+		input.toLowerCase() === "the clocktower"
+	) {
+		return {
+			is_valid: false,
+			message: `Boss Fights are not part of Neondle`,
+		};
+	} else {
+		return { is_valid: true, message: "" };
+	}
+};
 export const getResult = (
 	guessed_level: levelType,
 	target_level: levelType

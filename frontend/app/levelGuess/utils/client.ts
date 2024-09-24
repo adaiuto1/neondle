@@ -5,13 +5,13 @@ export const getTodaysLevel = async (
 ): Promise<levelType> => {
 	const response = await axios
 		.get(
-			`http://54.211.207.169:8000/levels/clue/today${
+			`http://localhost:8000/levels/clue/today${
 				!!silly_mode ? "/silly" : ""
-			}`
+			}?date=${new Date().toLocaleDateString()}`
 		)
 		.then((x) => {
 			return x.data[0];
 		})
-		.catch((err) => alert(err));
+		.catch((err) => {});
 	return response;
 };

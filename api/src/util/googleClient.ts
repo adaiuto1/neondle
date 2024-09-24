@@ -1,6 +1,6 @@
 import { google } from "googleapis";
 import fs from "fs";
-import type { levelType } from "../../../types";
+import type { levelType } from "../../types";
 export class googleClient {
 	credentials_file: string;
 	scopes: string[];

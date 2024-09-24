@@ -1,10 +1,12 @@
 import sjcl from "sjcl";
 import level_id_mapping from "./util/levelIdMapping.json";
 import level_id_list from "./util/levelIdList.json";
-export const getTodaysLevelIndex = (include_silly: boolean): number => {
+export const getTodaysLevelIndex = (
+	date_locale_string: string,
+	include_silly: boolean
+): number => {
 	const num_options = include_silly ? 118 : 87;
-	const today = new Date().toLocaleDateString("en-US");
-	const bit_array = sjcl.hash.sha256.hash(today);
+	const bit_array = sjcl.hash.sha256.hash(date_locale_string);
 	const level_index = (Math.abs(bit_array[0]) * 17) % num_options;
 	return level_index;
 };

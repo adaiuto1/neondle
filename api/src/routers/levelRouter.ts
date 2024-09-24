@@ -13,14 +13,24 @@ levelRouter.get("/all", async (req, res) => {
 	return res.send(levels);
 });
 levelRouter.get("/clue/today/silly", async (req, res) => {
-	const todays_level_index = getTodaysLevelIndex(true);
-	const level = await client.fetchSingleLevelByIndex(todays_level_index);
-	return res.send(level);
+	const { date } = req.query;
+	if (!!date) {
+		const todays_level_index = getTodaysLevelIndex(date.toString(), true);
+		const level = await client.fetchSingleLevelByIndex(todays_level_index);
+		return res.send(level);
+	} else {
+		return res.status(400).send("Missing 'time' query param");
+	}
 });
 levelRouter.get("/clue/today", async (req, res) => {
-	const todays_level_index = getTodaysLevelIndex(false);
-	const level = await client.fetchSingleLevelByIndex(todays_level_index);
-	return res.send(level);
+	const { date } = req.query;
+	if (!!date) {
+		const todays_level_index = getTodaysLevelIndex(date.toString(), false);
+		const level = await client.fetchSingleLevelByIndex(todays_level_index);
+		return res.send(level);
+	} else {
+		return res.status(400).send("Missing 'time' query param");
+	}
 });
 levelRouter.get("/clue/random", async (req, res) => {
 	const level_index = getRandomLevelIndex(false);

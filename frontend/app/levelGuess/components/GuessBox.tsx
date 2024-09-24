@@ -1,5 +1,5 @@
 import { Button, Input } from "@chakra-ui/react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 interface GuessBoxPropType {
 	width?: string;
 	onGuess: (input: string) => void;
@@ -12,9 +12,16 @@ export default function GuessBox({
 	disabled,
 }: GuessBoxPropType) {
 	const [formValue, setFormValue] = useState("");
+	const inputRef = useRef<HTMLInputElement>(null);
+	useEffect(() => {
+		if (inputRef.current) {
+			inputRef.current.focus();
+		}
+	}, [loading, disabled]);
 	return (
 		<>
 			<Input
+				ref={inputRef}
 				type="text"
 				value={formValue}
 				onChange={(e) => setFormValue(e.target.value)}
