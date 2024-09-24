@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getLevelIndexByName = exports.getLevelIndexById = exports.getRandomLevelIndex = exports.getTodaysLevelIndex = void 0;
+exports.getLevelIdByName = exports.getLevelIndexById = exports.getRandomLevelIndex = exports.getTodaysLevelIndex = void 0;
 const sjcl_1 = __importDefault(require("sjcl"));
 const levelIdMapping_json_1 = __importDefault(require("./util/levelIdMapping.json"));
 const levelIdList_json_1 = __importDefault(require("./util/levelIdList.json"));
@@ -21,16 +21,11 @@ const getRandomLevelIndex = (include_silly) => {
 };
 exports.getRandomLevelIndex = getRandomLevelIndex;
 const getLevelIndexById = (level_id) => {
-    if (levelIdList_json_1.default.includes(level_id)) {
-        const level_index = levelIdList_json_1.default.indexOf(level_id);
-        return level_index;
-    }
-    else {
-        return null;
-    }
+    const level_index = levelIdList_json_1.default.indexOf(level_id);
+    return level_index;
 };
 exports.getLevelIndexById = getLevelIndexById;
-const getLevelIndexByName = (name) => {
+const getLevelIdByName = (name) => {
     if (Object(levelIdMapping_json_1.default).hasOwnProperty(name)) {
         console.log(Object(levelIdMapping_json_1.default)[name]);
         return Object(levelIdMapping_json_1.default)[name];
@@ -39,4 +34,4 @@ const getLevelIndexByName = (name) => {
         return null;
     }
 };
-exports.getLevelIndexByName = getLevelIndexByName;
+exports.getLevelIdByName = getLevelIdByName;

@@ -73,23 +73,17 @@ levelRouter.get("/id/:level_id", (req, res) => __awaiter(void 0, void 0, void 0,
 }));
 levelRouter.get("/name/:level_name", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { level_name } = req.params;
-    if (!!level_name) {
-        const level_id = (0, levelSelector_1.getLevelIndexByName)(level_name);
-        if (!!level_id) {
-            const level_index = (0, levelSelector_1.getLevelIndexById)(level_id);
-            if (level_index !== null) {
-                const level = yield client.fetchSingleLevelByIndex(level_index);
-                return res.send(level);
-            }
-            else {
-                return res.status(404).send(`Invalid level_id: ${level_id}`);
-            }
-        }
-        else {
-            return res.status(404).send(`Invalid level_name: ${level_name}`);
-        }
-    }
-    else {
+    if (!level_name)
         return res.status(400).send("No level_name provided");
+    const level_id = (0, levelSelector_1.getLevelIdByName)(level_name);
+    if (!level_id)
+        return res.status(404).send(`Couldn't resolve level_id for ${level_name}`);
+    const level_index = (0, levelSelector_1.getLevelIndexById)(level_id);
+    const level = yield client.fetchSingleLevelByIndex(level_index);
+    if (!level) {
+        return res
+            .status(500)
+            .send(`Invalid index resolved for ${level_name}: ${level_index}`);
     }
+    return res.status(200).send(level);
 }));
