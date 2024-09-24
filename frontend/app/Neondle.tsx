@@ -8,7 +8,8 @@ export enum gameType {
 	"LEVEL_GUESS",
 	"ID_CHALLENGE",
 }
-export const API_URL = `http://localhost:8000`;
+// export const API_URL = `http://localhost:8000`;
+export const API_URL = `http://54.211.207.169:8000`;
 
 type gameContextType = {
 	currentGame: gameType;
