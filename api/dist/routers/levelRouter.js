@@ -24,14 +24,26 @@ levelRouter.get("/all", (req, res) => __awaiter(void 0, void 0, void 0, function
     return res.send(levels);
 }));
 levelRouter.get("/clue/today/silly", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const todays_level_index = (0, levelSelector_1.getTodaysLevelIndex)(true);
-    const level = yield client.fetchSingleLevelByIndex(todays_level_index);
-    return res.send(level);
+    const { date } = req.query;
+    if (!!date) {
+        const todays_level_index = (0, levelSelector_1.getTodaysLevelIndex)(date.toString(), true);
+        const level = yield client.fetchSingleLevelByIndex(todays_level_index);
+        return res.send(level);
+    }
+    else {
+        return res.status(400).send("Missing 'time' query param");
+    }
 }));
 levelRouter.get("/clue/today", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const todays_level_index = (0, levelSelector_1.getTodaysLevelIndex)(false);
-    const level = yield client.fetchSingleLevelByIndex(todays_level_index);
-    return res.send(level);
+    const { date } = req.query;
+    if (!!date) {
+        const todays_level_index = (0, levelSelector_1.getTodaysLevelIndex)(date.toString(), false);
+        const level = yield client.fetchSingleLevelByIndex(todays_level_index);
+        return res.send(level);
+    }
+    else {
+        return res.status(400).send("Missing 'time' query param");
+    }
 }));
 levelRouter.get("/clue/random", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const level_index = (0, levelSelector_1.getRandomLevelIndex)(false);

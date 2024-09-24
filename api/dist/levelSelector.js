@@ -7,10 +7,9 @@ exports.getLevelIndexByName = exports.getLevelIndexById = exports.getRandomLevel
 const sjcl_1 = __importDefault(require("sjcl"));
 const levelIdMapping_json_1 = __importDefault(require("./util/levelIdMapping.json"));
 const levelIdList_json_1 = __importDefault(require("./util/levelIdList.json"));
-const getTodaysLevelIndex = (include_silly) => {
+const getTodaysLevelIndex = (date_locale_string, include_silly) => {
     const num_options = include_silly ? 118 : 87;
-    const today = new Date().toLocaleDateString("en-US");
-    const bit_array = sjcl_1.default.hash.sha256.hash(today);
+    const bit_array = sjcl_1.default.hash.sha256.hash(date_locale_string);
     const level_index = (Math.abs(bit_array[0]) * 17) % num_options;
     return level_index;
 };
