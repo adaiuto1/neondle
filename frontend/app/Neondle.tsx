@@ -9,7 +9,7 @@ export enum gameType {
 	"ID_CHALLENGE",
 }
 // export const API_URL = `http://localhost:8000`;
-export const API_URL = `https://54.211.207.169:8000`;
+export const API_URL = `https://neondle.onrender.com`;
 
 type gameContextType = {
 	currentGame: gameType;
