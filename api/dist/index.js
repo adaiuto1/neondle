@@ -7,6 +7,7 @@ const express_1 = __importDefault(require("express"));
 const levelRouter_1 = require("./routers/levelRouter");
 const cors_1 = __importDefault(require("cors"));
 const https_1 = __importDefault(require("https"));
+const fs_1 = __importDefault(require("fs"));
 const PORT = 8000;
 const PORT_DEV = 8001;
 const corsOption = {
@@ -14,9 +15,6 @@ const corsOption = {
     origin: ["*"],
 };
 const app = (0, express_1.default)();
-https_1.default.createServer(app).listen(PORT_DEV, () => {
-    console.log(`dev server running on ${PORT_DEV}`);
-});
 app.use(express_1.default.json());
 app.use((0, cors_1.default)(corsOption));
 app.use(function (req, res, next) {
@@ -28,6 +26,11 @@ app.get("/", (req, res) => {
     res.send("Hello, World!");
 });
 app.use("/levels", levelRouter_1.levelRouter);
-app.listen(PORT, () => {
-    console.log(`API is listening at ${PORT_DEV}`);
+https_1.default
+    .createServer({
+    key: fs_1.default.readFileSync("localhost-key.pem"),
+    cert: fs_1.default.readFileSync("localhost.pem"),
+}, app)
+    .listen(PORT, () => {
+    console.log(`HTTPS server running on port ${PORT}`);
 });
