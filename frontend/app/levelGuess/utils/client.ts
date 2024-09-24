@@ -5,7 +5,7 @@ export const getTodaysLevel = async (
 ): Promise<levelType> => {
 	const response = await axios
 		.get(
-			`http://localhost:8000/levels/clue/today${
+			`http://54.211.207.169:8000/levels/clue/today${
 				!!silly_mode ? "/silly" : ""
 			}?date=${new Date().toLocaleDateString()}`
 		)
