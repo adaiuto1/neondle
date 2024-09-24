@@ -12,6 +12,8 @@ export const getTodaysLevel = async (
 		.then((x) => {
 			return x.data[0];
 		})
-		.catch((err) => {});
+		.catch(() => {
+			return null;
+		});
 	return response;
 };
