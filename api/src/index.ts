@@ -2,6 +2,7 @@ import express from "express";
 import { levelRouter } from "./routers/levelRouter";
 import cors from "cors";
 import https from "https";
+import fs from "fs";
 const PORT = 8000;
 const PORT_DEV = 8001;
 const corsOption = {
@@ -10,9 +11,7 @@ const corsOption = {
 };
 
 const app = express();
-https.createServer(app).listen(PORT_DEV, () => {
-	console.log(`dev server running on ${PORT_DEV}`);
-});
+
 app.use(express.json());
 app.use(cors(corsOption));
 
@@ -28,6 +27,14 @@ app.get("/", (req, res) => {
 	res.send("Hello, World!");
 });
 app.use("/levels", levelRouter);
-app.listen(PORT, () => {
-	console.log(`API is listening at ${PORT_DEV}`);
-});
+https
+	.createServer(
+		{
+			key: fs.readFileSync("localhost-key.pem"),
+			cert: fs.readFileSync("localhost.pem"),
+		},
+		app
+	)
+	.listen(PORT, () => {
+		console.log(`HTTPS server running on port ${PORT}`);
+	});
