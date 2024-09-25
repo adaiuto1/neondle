@@ -14,3 +14,7 @@ export type guesserResultType = {
 	record_time: "high" | "equal" | "low";
 	record_date: "high" | "equal" | "low";
 };
+export type userType = {
+	username: string;
+	password: string;
+};

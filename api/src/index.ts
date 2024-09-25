@@ -1,6 +1,10 @@
 import express from "express";
 import { levelRouter } from "./routers/levelRouter";
 import cors from "cors";
+import { userRouter } from "./routers/userRouter";
+import { PrismaClient } from "@prisma/client";
+export const prisma = new PrismaClient();
+
 const app = express();
 app.use(express.json());
 const PORT = 8000;
@@ -23,6 +27,7 @@ app.get("/", (req, res) => {
 	res.send("Hello, World!");
 });
 app.use("/levels", levelRouter);
+app.use("/users", userRouter);
 app.listen(PORT, () => {
 	console.log(`API is listening at ${PORT}`);
 });
