@@ -25,21 +25,30 @@ userRouter.post("/", async (req, res) => {
 });
 userRouter.post("/login", async (req, res) => {
 	const { username, password, token } = req.body;
-	let user;
 	if (!!token) {
-		user = await getUserFromToken(token);
+		const user = await getUserFromToken(token);
 		if (!user) {
 			return res.status(400).send(`Invalid user token ${token}`);
 		}
+		const new_token = createUserToken(user as userType);
+		return res.status(200).send({
+			username: user?.username,
+			token: new_token,
+		});
 	} else if (!!username && !!password) {
-		user = await getUserByName(username);
+		const user = await getUserByName(username);
 		if (!user) {
-			return res.status(400).send("Invalid username");
+			return res.status(400).send("User does not exist");
 		}
+		if (user?.password !== password) {
+			return res.status(403).send("Incorrect password");
+		}
+		const new_token = createUserToken(user as userType);
+		return res.status(200).send({
+			username: user?.username,
+			token: new_token,
+		});
+	} else {
+		return res.status(400).send("No login credentials provided");
 	}
-	const new_token = createUserToken(user as userType);
-	return res.status(200).send({
-		username: user?.username,
-		token: new_token,
-	});
 });

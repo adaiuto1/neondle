@@ -15,7 +15,8 @@ export type guesserResultType = {
 	record_time: "high" | "equal" | "low";
 	record_date: "high" | "equal" | "low";
 };
-export type levelGuessSession = {
-	date: string;
-	guesses: levelType[];
+
+type currentUserType = {
+	username: string | undefined;
+	token: string | undefined;
 };
