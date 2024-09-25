@@ -1,4 +1,5 @@
 import { API_URL } from "@/app/Neondle";
+import { decode } from "jsonwebtoken";
 import { levelType } from "@/types";
 import axios, { AxiosError, AxiosResponse } from "axios";
 interface levelResponseType {
@@ -18,7 +19,9 @@ export const getTodaysLevel = async (
 			}?date=${new Date().toLocaleDateString("en-US")}`
 		)
 		.then((x: AxiosResponse) => {
-			return { level: x.data[0] as levelType };
+			const d: any = decode(x.data);
+			const decoded_level = JSON.parse(d.level);
+			return { level: decoded_level[0] as levelType };
 		})
 		.catch((err: AxiosError) => {
 			return {

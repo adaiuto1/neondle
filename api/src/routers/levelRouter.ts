@@ -6,6 +6,8 @@ import {
 	getRandomLevelIndex,
 	getTodaysLevelIndex,
 } from "../levelSelector";
+import { sign } from "jsonwebtoken";
+import { jwt_secret } from "../util/prismaClients/userClient";
 const levelRouter = express.Router();
 const client = new googleClient();
 levelRouter.get("/all", async (req, res) => {
@@ -17,7 +19,12 @@ levelRouter.get("/clue/today/silly", async (req, res) => {
 	if (!!date) {
 		const todays_level_index = getTodaysLevelIndex(date.toString(), true);
 		const level = await client.fetchSingleLevelByIndex(todays_level_index);
-		return res.send(level);
+		try {
+			const encoded = sign({ level }, jwt_secret, { expiresIn: "1d" });
+			return res.send(encoded);
+		} catch (err) {
+			return res.status(500).send("Internal server error");
+		}
 	} else {
 		return res.status(400).send("Missing 'time' query param");
 	}
@@ -27,7 +34,12 @@ levelRouter.get("/clue/today", async (req, res) => {
 	if (!!date) {
 		const todays_level_index = getTodaysLevelIndex(date.toString(), false);
 		const level = await client.fetchSingleLevelByIndex(todays_level_index);
-		return res.send(level);
+		try {
+			const encoded = sign({ level }, jwt_secret, { expiresIn: "1d" });
+			return res.send(encoded);
+		} catch (err) {
+			return res.status(500).send("Internal server error");
+		}
 	} else {
 		return res.status(400).send("Missing 'time' query param");
 	}

@@ -2,7 +2,7 @@ import { user } from "@prisma/client";
 import { prisma } from "../../index";
 import { verify, sign, decode, JwtPayload } from "jsonwebtoken";
 import { userType } from "../../../types";
-const jwt_secret = "h34v3nc3ntr4l4uth0r1ty";
+export const jwt_secret = "h34v3nc3ntr4l4uth0r1ty";
 export const createUser = async (
 	username: string,
 	password: string
