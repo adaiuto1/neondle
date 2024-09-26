@@ -9,21 +9,21 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createUserToken = exports.getUserFromToken = exports.getUserByName = exports.createUser = void 0;
+exports.createUserToken = exports.getUserFromToken = exports.getUserByName = exports.createUser = exports.jwt_secret = void 0;
 const index_1 = require("../../index");
 const jsonwebtoken_1 = require("jsonwebtoken");
-const jwt_secret = "h34v3nc3ntr4l4uth0r1ty";
+exports.jwt_secret = "h34v3nc3ntr4l4uth0r1ty";
 const createUser = (username, password) => __awaiter(void 0, void 0, void 0, function* () {
     const new_user = yield index_1.prisma.user.create({
         data: {
-            username: username,
+            id: username,
             password: password,
         },
     });
     if (!new_user) {
         return null;
     }
-    const token = (0, jsonwebtoken_1.sign)({ username: username }, jwt_secret, {
+    const token = (0, jsonwebtoken_1.sign)({ username: username }, exports.jwt_secret, {
         expiresIn: "7d",
     });
     return { new_user: new_user, token: token };
@@ -32,7 +32,7 @@ exports.createUser = createUser;
 const getUserByName = (username) => __awaiter(void 0, void 0, void 0, function* () {
     const new_user = yield index_1.prisma.user.findFirst({
         where: {
-            username: username,
+            id: username,
         },
     });
     return new_user;
@@ -45,14 +45,14 @@ const getUserFromToken = (token) => __awaiter(void 0, void 0, void 0, function* 
     }
     const user = yield index_1.prisma.user.findFirst({
         where: {
-            username: username,
+            id: username,
         },
     });
     return user;
 });
 exports.getUserFromToken = getUserFromToken;
 const createUserToken = (user) => {
-    const token = (0, jsonwebtoken_1.sign)({ username: user.username }, jwt_secret, {
+    const token = (0, jsonwebtoken_1.sign)({ username: user.id }, exports.jwt_secret, {
         expiresIn: "7d",
     });
     return token;

@@ -13,8 +13,9 @@ export type guesserResultType = {
 	demons: "high" | "equal" | "low";
 	record_time: "high" | "equal" | "low";
 	record_date: "high" | "equal" | "low";
+	guessed_level: levelType;
 };
 export type userType = {
-	username: string;
+	id: string;
 	password: string;
 };

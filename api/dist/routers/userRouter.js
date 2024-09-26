@@ -30,26 +30,33 @@ exports.userRouter.post("/", (req, res) => __awaiter(void 0, void 0, void 0, fun
     return res.status(200).send(user_response);
 }));
 exports.userRouter.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    let user;
     const { username, password, token } = req.body;
     if (!!token) {
-        user = yield (0, userClient_1.getUserFromToken)(token);
+        const user = yield (0, userClient_1.getUserFromToken)(token);
         if (!user) {
             return res.status(400).send(`Invalid user token ${token}`);
         }
+        const new_token = (0, userClient_1.createUserToken)(user);
+        return res.status(200).send({
+            username: user === null || user === void 0 ? void 0 : user.id,
+            token: new_token,
+        });
     }
     else if (!!username && !!password) {
-        user = yield (0, userClient_1.getUserByName)(username);
+        const user = yield (0, userClient_1.getUserByName)(username);
         if (!user) {
             return res.status(400).send("User does not exist");
         }
+        if ((user === null || user === void 0 ? void 0 : user.password) !== password) {
+            return res.status(403).send("Incorrect password");
+        }
+        const new_token = (0, userClient_1.createUserToken)(user);
+        return res.status(200).send({
+            username: user === null || user === void 0 ? void 0 : user.id,
+            token: new_token,
+        });
     }
-    if ((user === null || user === void 0 ? void 0 : user.password) !== password) {
-        return res.status(403).send("Incorrect password");
+    else {
+        return res.status(400).send("No login credentials provided");
     }
-    const new_token = (0, userClient_1.createUserToken)(user);
-    return res.status(200).send({
-        username: user === null || user === void 0 ? void 0 : user.username,
-        token: new_token,
-    });
 }));

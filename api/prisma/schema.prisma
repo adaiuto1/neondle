@@ -6,7 +6,43 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-model user{
-    username    String @id @unique
-    password    String
+
+model user {
+  id       String    @id @unique
+  password String
+  session  session[]
+}
+
+model clue {
+  id         String    @id @unique @default(uuid())
+  date       String
+  level_name String
+  silly   Boolean  
+  session    session[]
+
+  @@unique([level_name, date, silly])
+}
+
+model session {
+  id      String   @id @unique @default(uuid())
+  clue_id String
+  clue    clue     @relation(fields: [clue_id], references: [id], onDelete:Cascade)
+  user    user     @relation(fields: [user_id], references: [id], onDelete:Cascade)
+  user_id String
+  results  result[]
+  @@unique([clue_id, user_id])
+}
+
+model result {
+  number     Int     @id @default(autoincrement())
+  session    session @relation(fields: [session_id], references: [id], onDelete:Cascade)
+  session_id String
+  name      Boolean
+  chapter   String
+  demons    String
+  record_time String
+  record_date String
+  guessed_level_name String
+  guessed_level String
+  @@unique([session_id, guessed_level_name])
 }

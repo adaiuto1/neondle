@@ -15,19 +15,27 @@ app.use(express_1.default.json());
 const PORT = 8000;
 const corsOption = {
     credentials: true,
-    origin: ["*"],
+    origin: ["http://localhost:3000", "neondle.vercel.app"], // Specific origin
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allow specific methods
+    allowedHeaders: ["Content-Type", "Authorization"], // Allow specific headers
 };
 app.use((0, cors_1.default)(corsOption));
-app.use(function (req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    next();
-});
+// Handle preflight requests for all routes
+app.options("*", (0, cors_1.default)(corsOption));
 app.get("/", (req, res) => {
     res.send("Hello, World!");
 });
 app.use("/levels", levelRouter_1.levelRouter);
 app.use("/users", userRouter_1.userRouter);
+// You don't need to add this separately because CORS middleware is already handling headers
+// app.use(function (req, res, next) {
+// 	res.header("Access-Control-Allow-Origin", "*");
+// 	res.header(
+// 		"Access-Control-Allow-Headers",
+// 		"Origin, X-Requested-With, Content-Type, Accept"
+// 	);
+// 	next();
+// });
 app.listen(PORT, () => {
     console.log(`API is listening at ${PORT}`);
 });

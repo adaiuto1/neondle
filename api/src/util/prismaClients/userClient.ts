@@ -9,7 +9,7 @@ export const createUser = async (
 ): Promise<{ new_user: userType; token: string } | null> => {
 	const new_user = await prisma.user.create({
 		data: {
-			username: username,
+			id: username,
 			password: password,
 		},
 	});
@@ -26,7 +26,7 @@ export const getUserByName = async (
 ): Promise<userType | null> => {
 	const new_user = await prisma.user.findFirst({
 		where: {
-			username: username,
+			id: username,
 		},
 	});
 	return new_user;
@@ -43,13 +43,13 @@ export const getUserFromToken = async (
 	}
 	const user = await prisma.user.findFirst({
 		where: {
-			username: username,
+			id: username,
 		},
 	});
 	return user;
 };
 export const createUserToken = (user: userType): string => {
-	const token = sign({ username: user.username }, jwt_secret, {
+	const token = sign({ username: user.id }, jwt_secret, {
 		expiresIn: "7d",
 	});
 	return token;

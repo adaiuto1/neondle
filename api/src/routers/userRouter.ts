@@ -32,7 +32,7 @@ userRouter.post("/login", async (req, res) => {
 		}
 		const new_token = createUserToken(user as userType);
 		return res.status(200).send({
-			username: user?.username,
+			username: user?.id,
 			token: new_token,
 		});
 	} else if (!!username && !!password) {
@@ -45,7 +45,7 @@ userRouter.post("/login", async (req, res) => {
 		}
 		const new_token = createUserToken(user as userType);
 		return res.status(200).send({
-			username: user?.username,
+			username: user?.id,
 			token: new_token,
 		});
 	} else {
