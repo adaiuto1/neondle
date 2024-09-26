@@ -49,7 +49,17 @@ levelRouter.get("/start", async (req, res) => {
 		if (!clue) return res.status(500).send("Internal Server Error");
 		const session = await findOrCreateSession(user_id?.toString(), clue.id);
 		return res.send({
-			session_id: session.id,
+			session: {
+				...session,
+				...{
+					results: session.results.map((result) => {
+						return {
+							...result,
+							guessed_level: JSON.parse(result.guessed_level),
+						};
+					}),
+				},
+			},
 		});
 	} catch (err) {
 		console.log(err);
@@ -83,19 +93,5 @@ levelRouter.post("/guess", async (req, res) => {
 	// }
 	return res.status(200).send(result);
 });
-levelRouter.get(`/resume`, async (req, res) => {
-	const { session_id, user_id } = req.query;
-	if (!session_id || !user_id)
-		return res.status(400).send("Missing params at /resume");
-	try {
-		const session = await getSessionById(session_id.toString());
-		if (session?.user_id === user_id.toString()) {
-			return res.status(200).send(session?.results);
-		} else {
-			return res.status(403).send("You cannot view results from this session");
-		}
-	} catch (err) {
-		return res.status(500).send("Internal server error");
-	}
-});
+
 export { levelRouter };

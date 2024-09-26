@@ -1,12 +1,61 @@
-import { useContext } from "react";
-import { GameContext, gameType } from "../Neondle";
-import { Box, Button, Center, HStack, VStack } from "@chakra-ui/react";
+import { useContext, useMemo, useState } from "react";
+import { GameContext, gameType, UserContext } from "../Neondle";
+import {
+	Box,
+	Button,
+	Center,
+	Fade,
+	Flex,
+	GenericAvatarIcon,
+	HStack,
+	Link,
+	Modal,
+	ModalContent,
+	ModalHeader,
+	ModalOverlay,
+	Spacer,
+	Spinner,
+	Text,
+	Tooltip,
+	useDisclosure,
+	VStack,
+} from "@chakra-ui/react";
+import { CalendarIcon, InfoOutlineIcon } from "@chakra-ui/icons";
+import LoginPage from "./LoginPage";
 
 export default function MainMenu() {
+	const { currentUser } = useContext(UserContext);
 	const { setCurrentGame } = useContext(GameContext);
+	const [awaitingGame, setAwaitingGame] = useState(false);
+	const { isOpen, onOpen, onClose } = useDisclosure();
 
+	useMemo(() => {
+		if (currentUser) onClose();
+	}, [currentUser]);
 	return (
 		<>
+			<Modal
+				isOpen={isOpen}
+				onClose={onClose}
+			>
+				<ModalOverlay></ModalOverlay>
+				<ModalContent>
+					<ModalHeader>Login</ModalHeader>
+					<Box
+						width="100%"
+						pb="1em"
+						px=" 1.5em"
+					>
+						<LoginPage
+							afterLogin={
+								awaitingGame
+									? () => setCurrentGame(gameType.LEVEL_GUESS)
+									: () => {}
+							}
+						></LoginPage>
+					</Box>
+				</ModalContent>
+			</Modal>
 			<Box
 				width="100%"
 				pt="10vh"
@@ -19,13 +68,86 @@ export default function MainMenu() {
 						<VStack width="100%">
 							<Button
 								width="100%"
-								onClick={() => setCurrentGame(gameType.LEVEL_GUESS)}
+								onClick={() => {
+									if (!currentUser.username) {
+										setAwaitingGame(true);
+										onOpen();
+									} else {
+										setCurrentGame(gameType.LEVEL_GUESS);
+									}
+								}}
 								variant="bar"
+								leftIcon={
+									<Flex
+										align="center"
+										gap={3}
+									>
+										<CalendarIcon></CalendarIcon>
+										{`Play Neondle`}
+									</Flex>
+								}
+								rightIcon={
+									<Box>
+										<HStack></HStack>
+									</Box>
+								}
+							></Button>
+							<Tooltip
+								label="Coming Soon!"
+								hasArrow
+								size="lg"
 							>
-								<HStack>
-									<Box>{`Play Neondle`}</Box>
-								</HStack>
-							</Button>
+								<Button
+									variant="bar"
+									width="100%"
+									isDisabled
+									_hover={{ bg: "blue.200", opacity: "50%" }}
+									leftIcon={
+										<Flex
+											align="center"
+											gap={3}
+										>
+											<InfoOutlineIcon></InfoOutlineIcon>
+											{`Leaderboards`}
+										</Flex>
+									}
+								></Button>
+							</Tooltip>
+							<HStack width="100%">
+								<Text>{new Date().toLocaleDateString()}</Text>
+								<Spacer></Spacer>
+								<Box
+									as={Link}
+									transition="400ms ease"
+									_hover={{
+										bg: "white",
+										textDecoration: "none",
+									}}
+									p="0.25em 0.5em"
+									borderRadius="0.25em"
+									onClick={!currentUser.username ? onOpen : () => {}}
+								>
+									<HStack>
+										{currentUser.loading === true ? (
+											<Box>
+												<Spinner></Spinner>
+											</Box>
+										) : (
+											<>
+												<Fade in={true}>
+													<Text>
+														{currentUser.username || `Register / Log In`}
+													</Text>
+												</Fade>
+												<GenericAvatarIcon
+													boxSize="1.5em"
+													color="black"
+												></GenericAvatarIcon>
+											</>
+										)}
+									</HStack>
+								</Box>
+							</HStack>
 						</VStack>
 					</Box>
 				</Center>

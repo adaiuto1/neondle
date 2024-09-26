@@ -9,13 +9,15 @@ const Button = defineStyleConfig({
 	},
 	variants: {
 		bar: {
+			transition: "200ms ease",
+
 			height: "75px",
 			bg: "white",
 			fontSize: "1.25em",
 			textAlign: "start",
-			justifyContent: "start",
+			justifyContent: "space-between",
 			_hover: {
-				bg: "primary.blue.500",
+				bg: "neutral.200",
 			},
 		},
 	},

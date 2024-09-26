@@ -25,13 +25,14 @@ export default function GuessBox({
 				type="text"
 				value={formValue}
 				onChange={(e) => setFormValue(e.target.value)}
-				disabled={loading || disabled}
+				isDisabled={loading || disabled}
+				placeholder={loading ? "Loading Today's Clue" : ""}
 				bg="#00000050"
 				color="white"
 				fontWeight="bold"
 				onKeyDown={async (e) => {
 					if (e.key == "Enter") {
-						await onGuess(formValue);
+						onGuess(formValue);
 						setFormValue("");
 					}
 				}}

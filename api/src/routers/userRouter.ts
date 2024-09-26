@@ -2,7 +2,7 @@ import express from "express";
 import crypto, { sign } from "crypto";
 import util from "util";
 import {
-	createUser,
+	registerUser,
 	createUserToken,
 	getUserByName,
 	getUserFromToken,
@@ -15,13 +15,17 @@ userRouter.post("/", async (req, res) => {
 	if (!username || !password) {
 		return res
 			.status(400)
-			.send("Invalid username/password in createUser request body.");
+			.send("Invalid/missing credentials in registerUser request body.");
 	}
-	const user_response = await createUser(username, password);
-	if (!user_response?.new_user) {
-		return res.status(500).send("Error creating new user");
+	const { response, error } = await registerUser(username, password);
+	if (response?.new_user) {
+		return res.status(200).send(response);
 	}
-	return res.status(200).send(user_response);
+	if (error) {
+		return res.status(error.status).send(error.message);
+	} else {
+		return res.status(500).send("Internal Server Error");
+	}
 });
 userRouter.post("/login", async (req, res) => {
 	const { username, password, token } = req.body;

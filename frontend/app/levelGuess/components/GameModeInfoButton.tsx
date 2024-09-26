@@ -13,29 +13,33 @@ import {
 	ModalHeader,
 	ModalOverlay,
 	Text,
+	Tooltip,
 	UnorderedList,
 	useDisclosure,
 } from "@chakra-ui/react";
-import { useEffect } from "react";
 
 export default function GameModeInfoButton() {
-	const has_played_before =
-		!!localStorage.getItem("LEVEL_GUESS") ||
-		!!localStorage.getItem("LEVEL_GUESS_SILLY");
 	const { isOpen, onOpen, onClose } = useDisclosure();
-	useEffect(() => {
-		if (!has_played_before) {
-			onOpen();
-		}
-	}, []);
+	// useEffect(() => {
+	// 	if (!has_played_before) {
+	// 		onOpen();
+	// 	}
+	// }, []);
 	return (
 		<>
-			<IconButton
-				aria-label="info"
-				icon={<InfoIcon></InfoIcon>}
-				variant="ghost"
-				onClick={() => onOpen()}
-			></IconButton>
+			<Tooltip
+				defaultIsOpen
+				label="Read the Rules!"
+				placement="left"
+				hasArrow
+			>
+				<IconButton
+					aria-label="info"
+					icon={<InfoIcon></InfoIcon>}
+					variant="ghost"
+					onClick={() => onOpen()}
+				></IconButton>
+			</Tooltip>
 			<Modal
 				isOpen={isOpen}
 				onClose={onClose}

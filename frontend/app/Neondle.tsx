@@ -1,6 +1,6 @@
 "use client";
 import { Box, Image, useToast } from "@chakra-ui/react";
-import { createContext, useEffect, useState } from "react";
+import { createContext, useEffect, useMemo, useState } from "react";
 import MainMenu from "./mainMenu/MainMenu";
 import LevelGuess from "./levelGuess/LevelGuess";
 import { currentUserType } from "@/types";
@@ -37,18 +37,17 @@ export default function Neondle() {
 	const [currentUser, setCurrentUser] = useState<currentUserType>({
 		username: undefined,
 		token: undefined,
+		loading: true,
 	});
 	const [currentGame, setCurrentGame] = useState<gameType>(gameType.MAIN_MENU);
 	useEffect(() => {
 		//set loading
-		if (!currentUser.username && !!localStorage.getItem("currentUser")) {
-			console.log("logging in");
+		if (!currentUser.username && !!loadCurrentUserFromStorage().token) {
 			login({
 				token: loadCurrentUserFromStorage().token,
 				setCurrentUser: (user: currentUserType) => {
 					setCurrentUser(user);
 					localStorage.setItem("currentUser", JSON.stringify(user));
-					//stop loading
 				},
 				onError: (message?: string) => {
 					toast({
@@ -59,9 +58,13 @@ export default function Neondle() {
 				},
 			});
 		}
+		setCurrentUser({ ...currentUser, ...{ loading: false } });
 	}, []);
-	useEffect(() => {
+	useMemo(() => {
 		console.log(currentUser);
+		if (!!currentUser.token) {
+			localStorage.setItem("currentUser", JSON.stringify(currentUser));
+		}
 	}, [currentUser]);
 	return (
 		<>

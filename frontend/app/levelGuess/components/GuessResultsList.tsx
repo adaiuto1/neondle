@@ -1,5 +1,4 @@
 import { guesserResultType } from "@/types";
-import { useEffect } from "react";
 import GuessResultRow from "./GuessResultRow";
 import {
 	Box,
@@ -9,44 +8,45 @@ import {
 	SimpleGrid,
 	Spacer,
 } from "@chakra-ui/react";
-
+import { useContext } from "react";
+import { SillyContext } from "../LevelGuess";
 export default function GuessResultsList({
 	results,
 }: {
 	results: guesserResultType[];
 }) {
-	useEffect(() => {
-		console.log(results);
-	}, [results]);
+	const sillyMode = useContext(SillyContext);
 	return (
 		<>
 			<SimpleGrid
-				columns={5}
+				columns={sillyMode ? 4 : 5}
 				rowGap={3}
-				width="80%"
+				width={sillyMode ? "60%" : "80%"}
 			>
-				<GridItem>
+				<GridItem fontSize={{ base: "xs", md: "md" }}>
 					<HStack>
 						<Spacer></Spacer>
 						<Box>Level</Box>
 					</HStack>
 				</GridItem>
-				<GridItem>
-					<Center>
-						<Box>Chapter</Box>
-					</Center>
-				</GridItem>
-				<GridItem>
+				{!sillyMode && (
+					<GridItem fontSize={{ base: "xs", md: "md" }}>
+						<Center>
+							<Box>Chapter</Box>
+						</Center>
+					</GridItem>
+				)}
+				<GridItem fontSize={{ base: "xs", md: "md" }}>
 					<Center>
 						<Box>Demons</Box>
 					</Center>
 				</GridItem>
-				<GridItem>
+				<GridItem fontSize={{ base: "xs", md: "md" }}>
 					<Center>
 						<Box>WR Time</Box>
 					</Center>
 				</GridItem>
-				<GridItem>
+				<GridItem fontSize={{ base: "xs", md: "md" }}>
 					<Center>
 						<Box>WR Date</Box>
 					</Center>

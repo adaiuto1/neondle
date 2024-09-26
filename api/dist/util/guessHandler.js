@@ -114,7 +114,6 @@ const validateGuessParams = (_a) => __awaiter(void 0, [_a], void 0, function* ({
 exports.validateGuessParams = validateGuessParams;
 const getResult = (level_name, session_id, google_client) => __awaiter(void 0, void 0, void 0, function* () {
     const session = yield (0, sessionClient_1.getSessionById)(session_id);
-    console.log(session);
     const guessed_level_index = (0, levelSelector_1.getLevelIndexByName)(level_name);
     const target_level_index = (0, levelSelector_1.getLevelIndexByName)((session === null || session === void 0 ? void 0 : session.clue.level_name) || "");
     const guessed_level_response = yield google_client.fetchSingleLevelByIndex(guessed_level_index);

@@ -24,6 +24,13 @@ const findOrCreateSession = (user_id, clue_id) => __awaiter(void 0, void 0, void
             clue_id: clue_id,
             user_id: user_id,
         },
+        include: {
+            results: {
+                orderBy: {
+                    number: "desc",
+                },
+            },
+        },
     });
     return session;
 });
@@ -60,11 +67,7 @@ const getSessionById = (session_id) => __awaiter(void 0, void 0, void 0, functio
         },
         include: {
             clue: true,
-            results: {
-                orderBy: {
-                    number: "desc",
-                },
-            },
+            results: true,
         },
     });
     return session;

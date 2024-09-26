@@ -9,11 +9,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createUserToken = exports.getUserFromToken = exports.getUserByName = exports.createUser = exports.jwt_secret = void 0;
+exports.createUserToken = exports.getUserFromToken = exports.getUserByName = exports.registerUser = exports.jwt_secret = void 0;
 const index_1 = require("../../index");
 const jsonwebtoken_1 = require("jsonwebtoken");
 exports.jwt_secret = "h34v3nc3ntr4l4uth0r1ty";
-const createUser = (username, password) => __awaiter(void 0, void 0, void 0, function* () {
+const registerUser = (username, password) => __awaiter(void 0, void 0, void 0, function* () {
+    const existing_user = yield index_1.prisma.user.findFirst({
+        where: {
+            id: username,
+        },
+    });
+    if (existing_user) {
+        return { error: { status: 403, message: "User Already Exists" } };
+    }
     const new_user = yield index_1.prisma.user.create({
         data: {
             id: username,
@@ -21,14 +29,13 @@ const createUser = (username, password) => __awaiter(void 0, void 0, void 0, fun
         },
     });
     if (!new_user) {
-        return null;
     }
     const token = (0, jsonwebtoken_1.sign)({ username: username }, exports.jwt_secret, {
         expiresIn: "7d",
     });
-    return { new_user: new_user, token: token };
+    return { response: { new_user: new_user, token: token } };
 });
-exports.createUser = createUser;
+exports.registerUser = registerUser;
 const getUserByName = (username) => __awaiter(void 0, void 0, void 0, function* () {
     const new_user = yield index_1.prisma.user.findFirst({
         where: {

@@ -1,9 +1,10 @@
 import { API_URL } from "@/app/Neondle";
-import { decode } from "jsonwebtoken";
+import { decode, JwtPayload } from "jsonwebtoken";
 import { levelType } from "@/types";
 import axios, { AxiosError, AxiosResponse } from "axios";
 interface levelResponseType {
 	level?: levelType;
+	session_id?: string;
 	error?: {
 		status: number;
 		message: string;
@@ -12,16 +13,17 @@ interface levelResponseType {
 export const getTodaysLevel = async (
 	silly_mode: boolean
 ): Promise<levelResponseType> => {
-	const guess_target: levelResponseType = await axios
+	const game_info: levelResponseType = await axios
 		.get(
 			`${API_URL}/levels/clue/today${
 				!!silly_mode ? "/silly" : ""
 			}?date=${new Date().toLocaleDateString("en-US")}`
 		)
-		.then((x: AxiosResponse) => {
-			const d: any = decode(x.data);
+		.then((response: AxiosResponse) => {
+			const { encoded_clue, session_id } = response.data;
+			const d: JwtPayload = decode(encoded_clue) as JwtPayload;
 			const decoded_level = JSON.parse(d.level);
-			return { level: decoded_level[0] as levelType };
+			return { level: decoded_level[0] as levelType, session_id: session_id };
 		})
 		.catch((err: AxiosError) => {
 			return {
@@ -33,13 +35,17 @@ export const getTodaysLevel = async (
 				},
 			};
 		});
-	return guess_target;
+	return game_info;
 };
-export const getLevelByName = async (
+export const makeGuess = async (
 	level_name: string
 ): Promise<levelResponseType> => {
 	const guess_target: levelResponseType = await axios
-		.get(`${API_URL}/levels/name/${level_name.toLowerCase()}`)
+		.post(`${API_URL}/levels/guess`, {
+			data: {
+				level_name: level_name,
+			},
+		})
 		.then((x: AxiosResponse) => {
 			return { level: x.data[0] as levelType };
 		})

@@ -41,7 +41,11 @@ levelRouter.get("/start", (req, res) => __awaiter(void 0, void 0, void 0, functi
             return res.status(500).send("Internal Server Error");
         const session = yield (0, sessionClient_1.findOrCreateSession)(user_id === null || user_id === void 0 ? void 0 : user_id.toString(), clue.id);
         return res.send({
-            session_id: session.id,
+            session: Object.assign(Object.assign({}, session), {
+                results: session.results.map((result) => {
+                    return Object.assign(Object.assign({}, result), { guessed_level: JSON.parse(result.guessed_level) });
+                }),
+            }),
         });
     }
     catch (err) {
@@ -71,21 +75,4 @@ levelRouter.post("/guess", (req, res) => __awaiter(void 0, void 0, void 0, funct
     // updateLeaderboards(user_id, score)
     // }
     return res.status(200).send(result);
-}));
-levelRouter.get(`/resume`, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { session_id, user_id } = req.query;
-    if (!session_id || !user_id)
-        return res.status(400).send("Missing params at /resume");
-    try {
-        const session = yield (0, sessionClient_1.getSessionById)(session_id.toString());
-        if ((session === null || session === void 0 ? void 0 : session.user_id) === user_id.toString()) {
-            return res.status(200).send(session === null || session === void 0 ? void 0 : session.results);
-        }
-        else {
-            return res.status(403).send("You cannot view results from this session");
-        }
-    }
-    catch (err) {
-        return res.status(500).send("Internal server error");
-    }
 }));

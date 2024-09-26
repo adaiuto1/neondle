@@ -14,6 +14,13 @@ export const findOrCreateSession = async (user_id: string, clue_id: string) => {
 			clue_id: clue_id,
 			user_id: user_id,
 		},
+		include: {
+			results: {
+				orderBy: {
+					number: "desc",
+				},
+			},
+		},
 	});
 	return session;
 };
@@ -50,11 +57,7 @@ export const getSessionById = async (session_id: string) => {
 		},
 		include: {
 			clue: true,
-			results: {
-				orderBy: {
-					number: "desc",
-				},
-			},
+			results: true,
 		},
 	});
 	return session;

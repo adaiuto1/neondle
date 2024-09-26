@@ -3,10 +3,28 @@ import { prisma } from "../../index";
 import { verify, sign, decode, JwtPayload } from "jsonwebtoken";
 import { userType } from "../../../types";
 export const jwt_secret = "h34v3nc3ntr4l4uth0r1ty";
-export const createUser = async (
+interface userResponseType {
+	response?: {
+		new_user: userType;
+		token: string;
+	};
+	error?: {
+		status: number;
+		message: string;
+	};
+}
+export const registerUser = async (
 	username: string,
 	password: string
-): Promise<{ new_user: userType; token: string } | null> => {
+): Promise<userResponseType> => {
+	const existing_user = await prisma.user.findFirst({
+		where: {
+			id: username,
+		},
+	});
+	if (existing_user) {
+		return { error: { status: 403, message: "User Already Exists" } };
+	}
 	const new_user = await prisma.user.create({
 		data: {
 			id: username,
@@ -14,12 +32,11 @@ export const createUser = async (
 		},
 	});
 	if (!new_user) {
-		return null;
 	}
 	const token = sign({ username: username }, jwt_secret, {
 		expiresIn: "7d",
 	});
-	return { new_user: new_user, token: token };
+	return { response: { new_user: new_user, token: token } };
 };
 export const getUserByName = async (
 	username: string

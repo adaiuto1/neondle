@@ -15,7 +15,7 @@ export const login = async ({
 	username,
 	password,
 	token,
-}: loginProps): Promise<void> => {
+}: loginProps) => {
 	await axios
 		.post(`${API_URL}/users/login`, {
 			username: username,
@@ -30,6 +30,27 @@ export const login = async ({
 			if (!!onError) {
 				onError(Object(err.response?.data).toString());
 			}
+		});
+};
+interface registerProps {
+	username: string;
+	password: string;
+	onSuccess?: () => void;
+	onError?: (error_message: string) => void;
+}
+export const register = async ({
+	username,
+	password,
+	onSuccess,
+	onError,
+}: registerProps) => {
+	await axios
+		.post(`${API_URL}/users`, { username: username, password: password })
+		.then(() => {
+			if (onSuccess) onSuccess();
+		})
+		.catch((err) => {
+			if (onError) onError(err.response.data);
 		});
 };
 export const loadCurrentUserFromStorage = (): currentUserType => {

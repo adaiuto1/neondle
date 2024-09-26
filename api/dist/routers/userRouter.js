@@ -21,13 +21,18 @@ exports.userRouter.post("/", (req, res) => __awaiter(void 0, void 0, void 0, fun
     if (!username || !password) {
         return res
             .status(400)
-            .send("Invalid username/password in createUser request body.");
+            .send("Invalid/missing credentials in registerUser request body.");
     }
-    const user_response = yield (0, userClient_1.createUser)(username, password);
-    if (!(user_response === null || user_response === void 0 ? void 0 : user_response.new_user)) {
-        return res.status(500).send("Error creating new user");
+    const { response, error } = yield (0, userClient_1.registerUser)(username, password);
+    if (response === null || response === void 0 ? void 0 : response.new_user) {
+        return res.status(200).send(response);
     }
-    return res.status(200).send(user_response);
+    if (error) {
+        return res.status(error.status).send(error.message);
+    }
+    else {
+        return res.status(500).send("Internal Server Error");
+    }
 }));
 exports.userRouter.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { username, password, token } = req.body;
