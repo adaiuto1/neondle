@@ -6,70 +6,92 @@ import {
 	getRandomLevelIndex,
 	getTodaysLevelIndex,
 } from "../levelSelector";
+import { decode, sign } from "jsonwebtoken";
+import { jwt_secret } from "../util/prismaClients/userClient";
+import { findOrCreateClue } from "../util/prismaClients/gameClient";
+import {
+	findOrCreateSession,
+	getSessionById,
+	updateGameSession,
+} from "../util/prismaClients/sessionClient";
+import { levelType } from "../../types";
+import {
+	commitResult,
+	getResult,
+	validateGuessParams,
+} from "../util/guessHandler";
 const levelRouter = express.Router();
-const client = new googleClient();
+const google_client = new googleClient();
 levelRouter.get("/all", async (req, res) => {
-	const levels = await client.fetchAllLevels();
+	const levels = await google_client.fetchAllLevels();
 	return res.send(levels);
 });
-levelRouter.get("/clue/today/silly", async (req, res) => {
-	const { date } = req.query;
-	if (!!date) {
-		const todays_level_index = getTodaysLevelIndex(date.toString(), true);
-		const level = await client.fetchSingleLevelByIndex(todays_level_index);
-		return res.send(level);
-	} else {
-		return res.status(400).send("Missing 'time' query param");
-	}
-});
-levelRouter.get("/clue/today", async (req, res) => {
-	const { date } = req.query;
-	if (!!date) {
-		const todays_level_index = getTodaysLevelIndex(date.toString(), false);
-		const level = await client.fetchSingleLevelByIndex(todays_level_index);
-		return res.send(level);
-	} else {
-		return res.status(400).send("Missing 'time' query param");
-	}
-});
-levelRouter.get("/clue/random", async (req, res) => {
-	const level_index = getRandomLevelIndex(false);
-	const level = await client.fetchSingleLevelByIndex(level_index);
-	return res.send(level);
-});
-levelRouter.get("/clue/random/silly", async (req, res) => {
-	const level_index = getRandomLevelIndex(true);
-	const level = await client.fetchSingleLevelByIndex(level_index);
-	return res.send(level);
-});
-levelRouter.get("/id/:level_id", async (req, res) => {
-	const { level_id } = req.params;
-	if (!!level_id) {
-		const level_index = getLevelIndexById(level_id);
-		if (level_index !== null) {
-			const level = await client.fetchSingleLevelByIndex(level_index);
-			return res.send(level);
-		} else {
-			return res.status(404).send(`Invalid level_id: ${level_id}`);
-		}
-	} else {
-		return res.send("No id provided");
-	}
-});
-levelRouter.get("/name/:level_name", async (req, res) => {
-	const { level_name } = req.params;
-	if (!level_name) return res.status(400).send("No level_name provided");
 
-	const level_id = getLevelIdByName(level_name);
-	if (!level_id)
-		return res.status(404).send(`Couldn't resolve level_id for ${level_name}`);
-	const level_index = getLevelIndexById(level_id);
-	const level = await client.fetchSingleLevelByIndex(level_index);
-	if (!level) {
-		return res
-			.status(500)
-			.send(`Invalid index resolved for ${level_name}: ${level_index}`);
+levelRouter.get("/start", async (req, res) => {
+	const { date, user_id, mode } = req.query;
+	const sillyMode = mode?.toString() === "silly";
+	if (!date) return res.status(400).send("Missing 'time' query param");
+	if (!user_id) return res.status(400).send("No user_id provided");
+
+	try {
+		const todays_level_index = getTodaysLevelIndex(
+			date.toString(),
+			!!sillyMode
+		);
+		const level = await google_client.fetchSingleLevelByIndex(
+			todays_level_index
+		);
+		const clue = await findOrCreateClue(
+			JSON.parse(level)[0].name.toLowerCase(),
+			date.toString(),
+			sillyMode
+		);
+		if (!clue) return res.status(500).send("Internal Server Error");
+		const session = await findOrCreateSession(user_id?.toString(), clue.id);
+		return res.send({
+			session: {
+				...session,
+				...{
+					results: session.results.map((result) => {
+						return {
+							...result,
+							guessed_level: JSON.parse(result.guessed_level),
+						};
+					}),
+				},
+			},
+		});
+	} catch (err) {
+		console.log(err);
+		return res.status(500).send("Internal server error");
 	}
-	return res.status(200).send(level);
 });
+
+levelRouter.post("/guess", async (req, res) => {
+	const { user_id, level_name } = req.body.data;
+	const { session_id } = req.query;
+	if (!level_name || !user_id || !session_id)
+		return res.status(400).send(`Missing query params at /levels/guess`);
+	const { is_valid, error_code, error_message } = await validateGuessParams({
+		user_id: user_id,
+		session_id: session_id.toString(),
+		level_name: level_name,
+	});
+	if (!is_valid) return res.status(error_code).send(error_message);
+	const result = await getResult(
+		level_name,
+		session_id.toString(),
+		google_client
+	);
+	if (!result.demons) {
+		return res.status(500).send("Error calculating result");
+	}
+	updateGameSession(session_id.toString(), result);
+	//if(result.name){
+	// const score = calculateScore(session_id)
+	// updateLeaderboards(user_id, score)
+	// }
+	return res.status(200).send(result);
+});
+
 export { levelRouter };

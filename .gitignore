@@ -5,3 +5,4 @@
 /api/localhost-key.pem
 /api/localhost.pem
 /frontend/node_modules
+/src/dist

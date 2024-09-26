@@ -26,14 +26,14 @@ export default function GuessResultBox({
 				return (
 					<ChevronDownIcon
 						boxSize={{ base: "1em", md: "2em" }}
-						ml="-1"
+						m="-3"
 					></ChevronDownIcon>
 				);
 			case "low":
 				return (
 					<ChevronUpIcon
 						boxSize={{ base: "1em", md: "2em" }}
-						ml="-1"
+						m="-3"
 					></ChevronUpIcon>
 				);
 		}
@@ -43,21 +43,20 @@ export default function GuessResultBox({
 			<Center>
 				<Box
 					height={{ base: "50px", lg: "75px" }}
-					width="90%"
+					width="100px"
 					borderRadius="0.75em"
 					bg={getColor()}
 				>
 					<HStack height="100%">
 						<VStack width="100% ">
-							<HStack>
-								<Heading
-									fontSize={{ base: "0.5em", sm: "0.75em", lg: "1em" }}
-									textAlign="end"
-								>
-									{value}
-								</Heading>
-								{getIcon()}
-							</HStack>
+							{accuracy === "low" && getIcon()}
+							<Heading
+								fontSize={{ base: "0.5em", sm: "0.75em", lg: "1.25em" }}
+								textAlign="end"
+							>
+								{value}
+							</Heading>
+							{accuracy === "high" && getIcon()}
 						</VStack>
 					</HStack>
 				</Box>

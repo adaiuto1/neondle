@@ -16,74 +16,63 @@ exports.levelRouter = void 0;
 const express_1 = __importDefault(require("express"));
 const googleClient_1 = require("../util/googleClient");
 const levelSelector_1 = require("../levelSelector");
+const gameClient_1 = require("../util/prismaClients/gameClient");
+const sessionClient_1 = require("../util/prismaClients/sessionClient");
+const guessHandler_1 = require("../util/guessHandler");
 const levelRouter = express_1.default.Router();
 exports.levelRouter = levelRouter;
-const client = new googleClient_1.googleClient();
+const google_client = new googleClient_1.googleClient();
 levelRouter.get("/all", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const levels = yield client.fetchAllLevels();
+    const levels = yield google_client.fetchAllLevels();
     return res.send(levels);
 }));
-levelRouter.get("/clue/today/silly", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { date } = req.query;
-    if (!!date) {
-        const todays_level_index = (0, levelSelector_1.getTodaysLevelIndex)(date.toString(), true);
-        const level = yield client.fetchSingleLevelByIndex(todays_level_index);
-        return res.send(level);
-    }
-    else {
+levelRouter.get("/start", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { date, user_id, mode } = req.query;
+    const sillyMode = (mode === null || mode === void 0 ? void 0 : mode.toString()) === "silly";
+    if (!date)
         return res.status(400).send("Missing 'time' query param");
+    if (!user_id)
+        return res.status(400).send("No user_id provided");
+    try {
+        const todays_level_index = (0, levelSelector_1.getTodaysLevelIndex)(date.toString(), !!sillyMode);
+        const level = yield google_client.fetchSingleLevelByIndex(todays_level_index);
+        const clue = yield (0, gameClient_1.findOrCreateClue)(JSON.parse(level)[0].name.toLowerCase(), date.toString(), sillyMode);
+        if (!clue)
+            return res.status(500).send("Internal Server Error");
+        const session = yield (0, sessionClient_1.findOrCreateSession)(user_id === null || user_id === void 0 ? void 0 : user_id.toString(), clue.id);
+        return res.send({
+            session: Object.assign(Object.assign({}, session), {
+                results: session.results.map((result) => {
+                    return Object.assign(Object.assign({}, result), { guessed_level: JSON.parse(result.guessed_level) });
+                }),
+            }),
+        });
+    }
+    catch (err) {
+        console.log(err);
+        return res.status(500).send("Internal server error");
     }
 }));
-levelRouter.get("/clue/today", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { date } = req.query;
-    if (!!date) {
-        const todays_level_index = (0, levelSelector_1.getTodaysLevelIndex)(date.toString(), false);
-        const level = yield client.fetchSingleLevelByIndex(todays_level_index);
-        return res.send(level);
+levelRouter.post("/guess", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { user_id, level_name } = req.body.data;
+    const { session_id } = req.query;
+    if (!level_name || !user_id || !session_id)
+        return res.status(400).send(`Missing query params at /levels/guess`);
+    const { is_valid, error_code, error_message } = yield (0, guessHandler_1.validateGuessParams)({
+        user_id: user_id,
+        session_id: session_id.toString(),
+        level_name: level_name,
+    });
+    if (!is_valid)
+        return res.status(error_code).send(error_message);
+    const result = yield (0, guessHandler_1.getResult)(level_name, session_id.toString(), google_client);
+    if (!result.demons) {
+        return res.status(500).send("Error calculating result");
     }
-    else {
-        return res.status(400).send("Missing 'time' query param");
-    }
-}));
-levelRouter.get("/clue/random", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const level_index = (0, levelSelector_1.getRandomLevelIndex)(false);
-    const level = yield client.fetchSingleLevelByIndex(level_index);
-    return res.send(level);
-}));
-levelRouter.get("/clue/random/silly", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const level_index = (0, levelSelector_1.getRandomLevelIndex)(true);
-    const level = yield client.fetchSingleLevelByIndex(level_index);
-    return res.send(level);
-}));
-levelRouter.get("/id/:level_id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { level_id } = req.params;
-    if (!!level_id) {
-        const level_index = (0, levelSelector_1.getLevelIndexById)(level_id);
-        if (level_index !== null) {
-            const level = yield client.fetchSingleLevelByIndex(level_index);
-            return res.send(level);
-        }
-        else {
-            return res.status(404).send(`Invalid level_id: ${level_id}`);
-        }
-    }
-    else {
-        return res.send("No id provided");
-    }
-}));
-levelRouter.get("/name/:level_name", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { level_name } = req.params;
-    if (!level_name)
-        return res.status(400).send("No level_name provided");
-    const level_id = (0, levelSelector_1.getLevelIdByName)(level_name);
-    if (!level_id)
-        return res.status(404).send(`Couldn't resolve level_id for ${level_name}`);
-    const level_index = (0, levelSelector_1.getLevelIndexById)(level_id);
-    const level = yield client.fetchSingleLevelByIndex(level_index);
-    if (!level) {
-        return res
-            .status(500)
-            .send(`Invalid index resolved for ${level_name}: ${level_index}`);
-    }
-    return res.status(200).send(level);
+    (0, sessionClient_1.updateGameSession)(session_id.toString(), result);
+    //if(result.name){
+    // const score = calculateScore(session_id)
+    // updateLeaderboards(user_id, score)
+    // }
+    return res.status(200).send(result);
 }));

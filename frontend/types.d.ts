@@ -9,13 +9,16 @@ export type levelType = {
 };
 export type guesserResultType = {
 	guessed_level: levelType;
+	guessed_level_name: string;
 	name: boolean;
 	chapter: "high" | "equal" | "low";
 	demons: "high" | "equal" | "low";
 	record_time: "high" | "equal" | "low";
 	record_date: "high" | "equal" | "low";
 };
-export type levelGuessSession = {
-	date: string;
-	guesses: levelType[];
+
+type currentUserType = {
+	username: string | undefined;
+	token: string | undefined;
+	loading?: boolean;
 };

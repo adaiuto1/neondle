@@ -44,7 +44,7 @@ export class googleClient {
 					auth,
 				});
 				const values = response.data.values;
-				console.log(values);
+
 				return jsonifyLevelData(values);
 			} catch (err) {
 				console.error("Error fetching data:", err);
