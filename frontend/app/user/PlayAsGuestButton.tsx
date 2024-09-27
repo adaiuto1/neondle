@@ -6,8 +6,8 @@ import { getAnonymousNeon } from "../utils/userClient";
 interface guestButtonProps {
 	to: gameType;
 }
-export default function PlayAsGuestButton({ to }: guestButtonProps) {
-	const { currentUser, setCurrentUser } = useContext(UserContext);
+export default function PlayAsGuestButton() {
+	const { setCurrentUser } = useContext(UserContext);
 	const [loading, setLoading] = useState(false);
 	const getNeonAccount = async () => {
 		setLoading(true);

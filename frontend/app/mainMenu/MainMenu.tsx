@@ -58,13 +58,7 @@ export default function MainMenu() {
 								<OptionsPage onClose={onClose}></OptionsPage>
 							</>
 						) : (
-							<LoginPage
-								afterLogin={
-									awaitingGame
-										? () => setCurrentGame(gameType.LEVEL_GUESS)
-										: () => {}
-								}
-							></LoginPage>
+							<LoginPage></LoginPage>
 						)}
 					</Box>
 				</ModalContent>
