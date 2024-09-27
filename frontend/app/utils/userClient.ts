@@ -87,3 +87,118 @@ export const loadCurrentUserFromStorage = (): currentUserType => {
 		return stored_user_object;
 	}
 };
+interface credentialsResponseType {
+	response?: {
+		username: string;
+		password?: string;
+		token?: string;
+	};
+	error?: {
+		status: number;
+		message: string;
+	};
+}
+export const getUserCredentials = async (
+	token: string
+): Promise<credentialsResponseType> => {
+	const { response, error }: credentialsResponseType = await axios
+		.get(`${API_URL}/users?token=${token}`)
+		.then((response: AxiosResponse) => {
+			return {
+				response: {
+					username: response.data.id,
+					password: response.data.password,
+				},
+			} as credentialsResponseType;
+		})
+		.catch((err: AxiosError) => {
+			return {
+				error: {
+					status: err.status,
+					message: err.response?.data,
+				},
+			} as credentialsResponseType;
+		});
+	if (response) {
+		return { response };
+	} else {
+		return { error };
+	}
+};
+
+export const changePassword = async (
+	token: string,
+	new_password: string
+): Promise<credentialsResponseType> => {
+	const { response, error }: credentialsResponseType = await axios
+		.put(`${API_URL}/users?token=${token}`, {
+			data: { new_password: new_password },
+		})
+		.then((response: AxiosResponse) => {
+			return {
+				response: {
+					username: response.data.username,
+					password: response.data.password,
+					token: response.data.token,
+				},
+			} as credentialsResponseType;
+		})
+		.catch((err: AxiosError) => {
+			return {
+				error: {
+					status: err.status,
+					message: err.response?.data,
+				},
+			} as credentialsResponseType;
+		});
+	if (response) {
+		return { response };
+	} else {
+		return { error };
+	}
+};
+
+export const logout = ({
+	setCurrentUser,
+}: {
+	setCurrentUser: (user: currentUserType) => void;
+}) => {
+	console.log("logging out");
+	setCurrentUser({ username: undefined, token: undefined });
+	localStorage.removeItem("currentUser");
+};
+interface deleteResponseType {
+	response?: {
+		success: boolean;
+	};
+	error?: {
+		status: number;
+		message: string;
+	};
+}
+export const deleteMyAccount = async (
+	token: string
+): Promise<deleteResponseType> => {
+	const { response, error }: deleteResponseType = await axios
+		.delete(`${API_URL}/users?token=${token}`)
+		.then(() => {
+			return {
+				response: {
+					success: true,
+				},
+			} as deleteResponseType;
+		})
+		.catch((err: AxiosError) => {
+			return {
+				error: {
+					status: err.status,
+					message: err.response?.data,
+				},
+			} as deleteResponseType;
+		});
+	if (response) {
+		return { response };
+	} else {
+		return { error };
+	}
+};

@@ -34,6 +34,53 @@ exports.userRouter.post("/", (req, res) => __awaiter(void 0, void 0, void 0, fun
         return res.status(500).send("Internal Server Error");
     }
 }));
+exports.userRouter.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { user_id, token } = req.query;
+    if (token) {
+        const credentials = yield (0, userClient_1.getUserFromToken)(token.toString());
+        if (credentials)
+            return res.status(200).send(credentials);
+        return res.status(500).send("Internal Server Error");
+    }
+    else if (user_id) {
+        {
+            const credentials = yield (0, userClient_1.getUserFromToken)(user_id.toString());
+            if (credentials)
+                return res.status(200).send(credentials);
+            return res.status(500).send("Internal Server Error");
+        }
+    }
+    else {
+        return res.status(400).send("Missing query params at get /users");
+    }
+}));
+exports.userRouter.put("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { token } = req.query;
+    const { new_id, new_password } = req.body.data;
+    if (!token)
+        return res.status(400).send("Missing token at put /users");
+    try {
+        const user = yield (0, userClient_1.getUserFromToken)(token.toString());
+        if (!user)
+            return res.status(404).send("User not found from token");
+        const updated_user = yield (0, userClient_1.updateUser)({
+            id: user.id,
+            new_id: new_id,
+            new_password: new_password,
+        });
+        if (updated_user) {
+            const new_token = (0, userClient_1.createUserToken)(updated_user);
+            return res.status(200).send({
+                username: updated_user.id,
+                password: updated_user.password,
+                token: new_token,
+            });
+        }
+    }
+    catch (err) {
+        return res.status(500).send("Internal Server Error");
+    }
+}));
 exports.userRouter.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { username, password, token } = req.body;
     if (!!token) {
@@ -63,5 +110,21 @@ exports.userRouter.post("/login", (req, res) => __awaiter(void 0, void 0, void 0
     }
     else {
         return res.status(400).send("No login credentials provided");
+    }
+}));
+exports.userRouter.delete("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { token } = req.query;
+    if (!token)
+        return res.status(400).send("No token provided");
+    try {
+        const user = yield (0, userClient_1.getUserFromToken)(token.toString());
+        if (!user)
+            return res.status(404).send("No user associated with this token");
+        yield (0, userClient_1.deleteUser)(user === null || user === void 0 ? void 0 : user.id);
+        return res.status(200).send("Success");
+    }
+    catch (err) {
+        console.log(err);
+        return res.status(500).send("Couldn't delete user");
     }
 }));

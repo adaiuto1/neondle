@@ -22,6 +22,7 @@ import {
 } from "@chakra-ui/react";
 import { CalendarIcon, InfoOutlineIcon } from "@chakra-ui/icons";
 import LoginPage from "./LoginPage";
+import OptionsPage from "./OptionsPage";
 
 export default function MainMenu() {
 	const { currentUser } = useContext(UserContext);
@@ -44,19 +45,27 @@ export default function MainMenu() {
 			>
 				<ModalOverlay></ModalOverlay>
 				<ModalContent>
-					<ModalHeader>Login</ModalHeader>
+					<ModalHeader>
+						{currentUser.username ? "Options" : "Login"}
+					</ModalHeader>
 					<Box
 						width="100%"
 						pb="1em"
 						px=" 1.5em"
 					>
-						<LoginPage
-							afterLogin={
-								awaitingGame
-									? () => setCurrentGame(gameType.LEVEL_GUESS)
-									: () => {}
-							}
-						></LoginPage>
+						{!!currentUser.username ? (
+							<>
+								<OptionsPage onClose={onClose}></OptionsPage>
+							</>
+						) : (
+							<LoginPage
+								afterLogin={
+									awaitingGame
+										? () => setCurrentGame(gameType.LEVEL_GUESS)
+										: () => {}
+								}
+							></LoginPage>
+						)}
 					</Box>
 				</ModalContent>
 			</Modal>
@@ -129,7 +138,7 @@ export default function MainMenu() {
 									}}
 									p="0.25em 0.5em"
 									borderRadius="0.25em"
-									onClick={!currentUser.username ? onOpen : () => {}}
+									onClick={onOpen}
 								>
 									<HStack>
 										{currentUser.loading === true ? (
