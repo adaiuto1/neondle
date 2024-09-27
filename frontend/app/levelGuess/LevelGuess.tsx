@@ -30,6 +30,12 @@ import { GameContext, gameType, UserContext } from "../Neondle";
 import { getResult } from "./utils/guessHandler";
 export const SillyContext = createContext(false);
 export default function LevelGuess() {
+	const todays_date = new Date().toLocaleDateString("en-US", {
+		weekday: "long",
+		year: "numeric",
+		month: "long",
+		day: "numeric",
+	});
 	const toast = useToast();
 	const { setCurrentGame } = useContext(GameContext);
 	const { currentUser } = useContext(UserContext);
@@ -120,14 +126,7 @@ export default function LevelGuess() {
 										_hover={{ cursor: "pointer" }}
 										onClick={() => setCurrentGame(gameType.MAIN_MENU)}
 									>{`Neondle ${!!sillyMode ? "- Hard Mode" : ""}`}</Heading>
-									<Text>
-										{new Date().toLocaleDateString("en-US", {
-											weekday: "long",
-											year: "numeric",
-											month: "long",
-											day: "numeric",
-										})}
-									</Text>
+									<Text>{todays_date}</Text>
 								</Box>
 								<Spacer></Spacer>
 

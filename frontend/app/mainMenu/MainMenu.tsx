@@ -28,7 +28,11 @@ export default function MainMenu() {
 	const { setCurrentGame } = useContext(GameContext);
 	const [awaitingGame, setAwaitingGame] = useState(false);
 	const { isOpen, onOpen, onClose } = useDisclosure();
-
+	const todays_date = new Date().toLocaleDateString("en-US", {
+		year: "numeric",
+		month: "short",
+		day: "numeric",
+	});
 	useMemo(() => {
 		if (currentUser) onClose();
 	}, [currentUser]);
@@ -114,7 +118,7 @@ export default function MainMenu() {
 								></Button>
 							</Tooltip>
 							<HStack width="100%">
-								<Text>{new Date().toLocaleDateString()}</Text>
+								<Text>{todays_date}</Text>
 								<Spacer></Spacer>
 								<Box
 									as={Link}
