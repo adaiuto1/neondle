@@ -11,6 +11,7 @@ model user {
   id       String    @id @unique
   password String
   streak   Int       @default(0)
+  date_created DateTime @default(now())
   session  session[]
 }
 

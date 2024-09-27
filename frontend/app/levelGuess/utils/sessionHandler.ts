@@ -41,3 +41,20 @@ export const onLose = (results: guesserResultType[]) => {
 	if (!!results) {
 	}
 };
+export const getEmojiScoreboard = (results: guesserResultType[]) => {
+	const emojiMap = {
+		high: "🟥",
+		low: "🟦",
+		equal: "🟩",
+	};
+	let emojiString = "";
+
+	for (const row of results) {
+		const chapterEmoji = emojiMap[row.chapter];
+		const demonsEmoji = emojiMap[row.demons];
+		const recordTimeEmoji = emojiMap[row.record_time];
+		const recordDateEmoji = emojiMap[row.record_date];
+		emojiString += `${chapterEmoji} ${demonsEmoji} ${recordTimeEmoji} ${recordDateEmoji}\n`;
+	}
+	console.log(emojiString);
+};

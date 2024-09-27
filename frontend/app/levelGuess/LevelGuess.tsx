@@ -21,7 +21,7 @@ import {
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import type { guesserResultType } from "@/types";
 import GuessBox from "./components/GuessBox";
-import { loadSession, onWin } from "./utils/sessionHandler";
+import { getEmojiScoreboard, loadSession, onWin } from "./utils/sessionHandler";
 import GuessResultsList from "./components/GuessResultsList";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 
@@ -43,7 +43,7 @@ export default function LevelGuess() {
 	const [sessionId, setSessionId] = useState<string | undefined>(undefined);
 	const [results, setResults] = useState<guesserResultType[]>([]);
 	const [awaitingResponse, setAwaitingResponse] = useState(false);
-	// const [lives, setLives] = useState(10);
+	const { isOpen, onOpen, onClose } = useState(false);
 	const game_finished = !!results[0] && results[0].name;
 	const addResult = (new_result: guesserResultType) => {
 		setResults([new_result, ...results]);
@@ -56,7 +56,7 @@ export default function LevelGuess() {
 	useMemo(() => {
 		if (!!results[0]) {
 			if (results[0].name) {
-				onWin(results);
+				onWin();
 			}
 		}
 	}, [results]);
@@ -131,37 +131,6 @@ export default function LevelGuess() {
 								<Spacer></Spacer>
 
 								<GameModeInfoButton></GameModeInfoButton>
-
-								<Menu>
-									<MenuButton
-										as={Button}
-										rightIcon={<ChevronDownIcon />}
-										isDisabled={awaitingResponse}
-										colorScheme={sillyMode ? "red" : "green"}
-									>
-										{sillyMode ? "Hard Mode" : "Normal Mode"}
-									</MenuButton>
-									<MenuList>
-										<MenuItem
-											isDisabled={!sillyMode}
-											onClick={() => {
-												setResults([]);
-												setSillyMode(false);
-											}}
-										>
-											Normal Mode
-										</MenuItem>
-										<MenuItem
-											isDisabled={sillyMode}
-											onClick={() => {
-												setResults([]);
-												setSillyMode(true);
-											}}
-										>
-											Hard Mode
-										</MenuItem>
-									</MenuList>
-								</Menu>
 							</HStack>
 							<Divider
 								mb="1em"

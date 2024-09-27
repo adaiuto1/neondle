@@ -76,7 +76,7 @@ userRouter.post("/login", async (req, res) => {
 	if (!!token) {
 		const user = await getUserFromToken(token);
 		if (!user) {
-			return res.status(400).send(`Invalid user token ${token}`);
+			return res.status(406).send(`Invalid user token ${token}`);
 		}
 		const new_token = createUserToken(user as userType);
 		return res.status(200).send({

@@ -57,23 +57,31 @@ export const login = async ({
 interface registerProps {
 	username: string;
 	password: string;
-	onSuccess?: () => void;
-	onError?: (error_message: string) => void;
 }
 export const register = async ({
 	username,
 	password,
-	onSuccess,
-	onError,
-}: registerProps) => {
-	await axios
+}: registerProps): Promise<loginResponseType> => {
+	const { response, error }: loginResponseType = await axios
 		.post(`${API_URL}/users`, { username: username, password: password })
-		.then(() => {
-			if (onSuccess) onSuccess();
+		.then((response: AxiosResponse) => {
+			return {
+				response: {
+					username: response.data.new_user.id,
+					token: response.data.token,
+				},
+			};
 		})
-		.catch((err) => {
-			if (onError) onError(err.response.data);
+		.catch((err: AxiosResponse) => {
+			return {
+				error: {
+					status: err.status,
+					message: err.data,
+				},
+			};
 		});
+	if (response) return { response };
+	else return { error };
 };
 export const loadCurrentUserFromStorage = (): currentUserType => {
 	const stored_user = localStorage.getItem("currentUser");
@@ -196,6 +204,22 @@ export const deleteMyAccount = async (
 				},
 			} as deleteResponseType;
 		});
+	if (response) {
+		return { response };
+	} else {
+		return { error };
+	}
+};
+
+export const getAnonymousNeon = async (): Promise<loginResponseType> => {
+	const username = `AnonymousNeon${new Date().getTime().toString()}${Math.floor(
+		Math.random() * 1000
+	).toString()}`;
+	const password = "believer";
+	const { response, error } = await register({
+		username: username,
+		password: password,
+	});
 	if (response) {
 		return { response };
 	} else {

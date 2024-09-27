@@ -52,7 +52,6 @@ export default function OptionsPage({ onClose }: { onClose?: () => void }) {
 	const loadCredentials = async () => {
 		if (currentUser.token) {
 			const { response, error } = await getUserCredentials(currentUser.token);
-			console.log(response);
 			if (response) {
 				setUser({
 					username: response.username,
@@ -103,7 +102,6 @@ export default function OptionsPage({ onClose }: { onClose?: () => void }) {
 		setAwaitingReset(true);
 		if (currentUser.token) {
 			const { response, error } = await deleteMyAccount(currentUser.token);
-			console.log(response);
 			if (response?.success) {
 				toast({
 					position: "top",

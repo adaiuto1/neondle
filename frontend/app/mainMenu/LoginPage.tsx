@@ -42,7 +42,12 @@ export default function LoginPage({ afterLogin }: { afterLogin?: () => void }) {
 		await login({
 			username: formValues.username,
 			password: formValues.password,
-			setCurrentUser: setCurrentUser,
+			setCurrentUser: (user) => {
+				setCurrentUser(user);
+				if (!!afterLogin) {
+					afterLogin();
+				}
+			},
 			onError: ({ error }) => {
 				if (error?.status === 400) {
 					setAction("register");
@@ -52,9 +57,7 @@ export default function LoginPage({ afterLogin }: { afterLogin?: () => void }) {
 				});
 			},
 		});
-		if (!!afterLogin && !!currentUser.username) {
-			afterLogin();
-		}
+
 		setAwaitingResponse(false);
 	};
 	const onRegister = async () => {
@@ -66,18 +69,19 @@ export default function LoginPage({ afterLogin }: { afterLogin?: () => void }) {
 				title: "Passwords must match",
 			});
 		} else {
-			await register({
+			const { response, error } = await register({
 				username: formValues.username,
 				password: formValues.password,
-				onSuccess: () => onLogin(),
-				onError: (error_message?: string) => {
-					toast({
-						position: "top",
-						colorScheme: "orange",
-						title: error_message || "Error",
-					});
-				},
 			});
+			if (response) {
+				setCurrentUser({ username: response.username, token: response.token });
+			} else {
+				toast({
+					position: "top",
+					colorScheme: "red",
+					title: error?.message,
+				});
+			}
 		}
 		setAwaitingResponse(false);
 	};
