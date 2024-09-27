@@ -15,11 +15,10 @@ import {
 	useToast,
 	VStack,
 } from "@chakra-ui/react";
-import { currentUserType } from "@/types";
 
 export default function LoginPage({ afterLogin }: { afterLogin?: () => void }) {
 	const toast = useToast();
-	const { setCurrentUser } = useContext(UserContext);
+	const { currentUser, setCurrentUser } = useContext(UserContext);
 	const [action, setAction] = useState<"login" | "register">("login");
 	const [awaitingResponse, setAwaitingResponse] = useState(false);
 	const [formValues, setFormValues] = useState({
@@ -43,20 +42,17 @@ export default function LoginPage({ afterLogin }: { afterLogin?: () => void }) {
 		await login({
 			username: formValues.username,
 			password: formValues.password,
-			setCurrentUser: (user: currentUserType) => {
-				setCurrentUser({
-					username: user.username,
-					token: user.token,
-					loading: false,
+			setCurrentUser: setCurrentUser,
+			onError: ({ error }) => {
+				if (error?.status === 400) {
+					setAction("register");
+				}
+				setFormError({
+					password: error?.message,
 				});
 			},
-			onError: () =>
-				setFormError({
-					username: "something",
-					password: "Invalid Credentials",
-				}),
 		});
-		if (!!afterLogin) {
+		if (!!afterLogin && !!currentUser.username) {
 			afterLogin();
 		}
 		setAwaitingResponse(false);
@@ -92,7 +88,7 @@ export default function LoginPage({ afterLogin }: { afterLogin?: () => void }) {
 				gap={3}
 				alignItems="end"
 			>
-				<FormControl isInvalid={!!formErrors.username}>
+				<FormControl isInvalid={!!formErrors.password}>
 					<FormLabel>Username</FormLabel>
 					<Input
 						type="text"

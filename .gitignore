@@ -6,3 +6,4 @@
 /api/localhost.pem
 /frontend/node_modules
 /src/dist
+api/.env

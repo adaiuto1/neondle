@@ -5,32 +5,54 @@ interface loginProps {
 	username?: string;
 	password?: string;
 	token?: string;
-	setCurrentUser: (currentUser: currentUserType) => void;
-	onError?: (message?: string) => void;
+	setCurrentUser: (user: currentUserType) => void;
+	onError?: (err: loginResponseType) => void;
 }
-
+interface loginResponseType {
+	response?: {
+		username: string;
+		token: string;
+	};
+	error?: {
+		status: number;
+		message: string;
+	};
+}
 export const login = async ({
-	setCurrentUser,
-	onError,
 	username,
 	password,
 	token,
+	setCurrentUser,
+	onError,
 }: loginProps) => {
-	await axios
+	const { response, error }: loginResponseType = await axios
 		.post(`${API_URL}/users/login`, {
 			username: username,
 			password: password,
 			token: token,
 		})
 		.then((response: AxiosResponse) => {
-			const { username, token } = response.data;
-			setCurrentUser({ username, token } as currentUserType);
+			return {
+				response: {
+					username: response.data.username,
+					token: response.data.token,
+				},
+			} as loginResponseType;
 		})
 		.catch((err: AxiosError) => {
-			if (!!onError) {
-				onError(Object(err.response?.data).toString());
-			}
+			return {
+				error: {
+					status: err.status,
+					message: err.response?.data,
+				},
+			} as loginResponseType;
 		});
+	if (response?.token) {
+		setCurrentUser(response);
+	}
+	if (!!error && !!onError) {
+		onError({ error });
+	}
 };
 interface registerProps {
 	username: string;
