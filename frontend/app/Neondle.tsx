@@ -49,11 +49,11 @@ export default function Neondle() {
 					setCurrentUser(user);
 					localStorage.setItem("currentUser", JSON.stringify(user));
 				},
-				onError: (message?: string) => {
+				onError: ({ error }) => {
 					toast({
 						colorScheme: "red",
 						title: "Login Error",
-						description: `${message}.\n Please log in again.`,
+						description: `${error?.message}.\n Please log in again.`,
 					});
 				},
 			});
