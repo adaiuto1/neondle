@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 import { UserContext } from "../Neondle";
 import { login, register } from "../utils/userClient";
 import {
@@ -43,22 +43,16 @@ export default function LoginPage({ afterLogin }: { afterLogin?: () => void }) {
 		await login({
 			username: formValues.username,
 			password: formValues.password,
-			setCurrentUser: (user: currentUserType) => {
-				setCurrentUser({
-					username: user.username,
-					token: user.token,
-					loading: false,
+			setCurrentUser: setCurrentUser,
+			onError: ({ error }) => {
+				if (error?.status === 400) {
+					setAction("register");
+				}
+				setFormError({
+					password: error?.message,
 				});
 			},
-			onError: () =>
-				setFormError({
-					username: "something",
-					password: "Invalid Credentials",
-				}),
 		});
-		if (!!afterLogin) {
-			afterLogin();
-		}
 		setAwaitingResponse(false);
 	};
 	const onRegister = async () => {
@@ -92,7 +86,7 @@ export default function LoginPage({ afterLogin }: { afterLogin?: () => void }) {
 				gap={3}
 				alignItems="end"
 			>
-				<FormControl isInvalid={!!formErrors.username}>
+				<FormControl isInvalid={!!formErrors.password}>
 					<FormLabel>Username</FormLabel>
 					<Input
 						type="text"
