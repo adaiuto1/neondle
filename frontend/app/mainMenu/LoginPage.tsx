@@ -1,4 +1,4 @@
-import { useContext, useMemo, useState } from "react";
+import { useContext, useState } from "react";
 import { UserContext } from "../Neondle";
 import { login, register } from "../utils/userClient";
 import {
@@ -15,11 +15,10 @@ import {
 	useToast,
 	VStack,
 } from "@chakra-ui/react";
-import { currentUserType } from "@/types";
 
 export default function LoginPage({ afterLogin }: { afterLogin?: () => void }) {
 	const toast = useToast();
-	const { setCurrentUser } = useContext(UserContext);
+	const { currentUser, setCurrentUser } = useContext(UserContext);
 	const [action, setAction] = useState<"login" | "register">("login");
 	const [awaitingResponse, setAwaitingResponse] = useState(false);
 	const [formValues, setFormValues] = useState({
@@ -53,6 +52,9 @@ export default function LoginPage({ afterLogin }: { afterLogin?: () => void }) {
 				});
 			},
 		});
+		if (!!afterLogin && !!currentUser.username) {
+			afterLogin();
+		}
 		setAwaitingResponse(false);
 	};
 	const onRegister = async () => {
