@@ -20,6 +20,12 @@ export const findOrCreateSession = async (user_id: string, clue_id: string) => {
 					number: "desc",
 				},
 			},
+			clue: {
+				select: {
+					id: true,
+					silly: true,
+				},
+			},
 		},
 	});
 	return session;
@@ -61,4 +67,63 @@ export const getSessionById = async (session_id: string) => {
 		},
 	});
 	return session;
+};
+export const getDaysResults = async (
+	date_string: string,
+	user_id: string
+): Promise<{
+	normal_results?: object[];
+	silly_results?: object[];
+	error?: any;
+}> => {
+	try {
+		const daysResults = await prisma.result.findMany({
+			where: {
+				session: {
+					clue: {
+						date: date_string,
+					},
+					user_id: user_id,
+				},
+			},
+			include: {
+				session: {
+					select: {
+						clue: true,
+					},
+				},
+			},
+			orderBy: {
+				number: "desc",
+			},
+		});
+		let normal_results = daysResults
+			.filter((result) => !result.session.clue.silly)
+			.map((result) => {
+				const {
+					guessed_level,
+					session,
+					session_id,
+					guessed_level_name,
+					...rest
+				} = result;
+				return rest;
+			});
+		let silly_results = daysResults
+			.filter((result) => result.session.clue.silly)
+			.map((result) => {
+				const {
+					guessed_level,
+					session,
+					session_id,
+					guessed_level_name,
+					...rest
+				} = result;
+				return rest;
+			});
+
+		return { normal_results: normal_results, silly_results: silly_results };
+	} catch (err) {
+		return { error: "cant get results" };
+	}
 };

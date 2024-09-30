@@ -38,8 +38,8 @@ export const getLevelIndexByName = (level_name: string): number => {
 	}
 };
 export const getLevelIdByName = (name: string): string | null => {
-	if (Object(level_id_mapping).hasOwnProperty(name)) {
-		console.log(Object(level_id_mapping)[name]);
+	if (Object(level_id_mapping).hasOwnProperty(name.toLowerCase().toString())) {
+		console.log(Object(level_id_mapping)[name.toLowerCase().toString()]);
 		return Object(level_id_mapping)[name];
 	} else {
 		return null;

@@ -8,26 +8,27 @@ import {
 	Button,
 	SimpleGrid,
 	GridItem,
-	Menu,
-	MenuList,
-	MenuItem,
-	MenuButton,
 	Divider,
 	Text,
 	useToast,
 	Fade,
 	Flex,
+	useDisclosure,
+	Modal,
+	ModalOverlay,
+	ModalContent,
+	ModalHeader,
+	ModalCloseButton,
 } from "@chakra-ui/react";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import type { guesserResultType } from "@/types";
 import GuessBox from "./components/GuessBox";
-import { loadSession, onWin } from "./utils/sessionHandler";
+import { loadSession } from "./utils/sessionHandler";
 import GuessResultsList from "./components/GuessResultsList";
-import { ChevronDownIcon } from "@chakra-ui/icons";
-
 import GameModeInfoButton from "./components/GameModeInfoButton";
 import { GameContext, gameType, UserContext } from "../Neondle";
 import { getResult } from "./utils/guessHandler";
+import GameCompletedScreen from "./components/GameCompletedScreen";
 export const SillyContext = createContext(false);
 export default function LevelGuess() {
 	const todays_date = new Date().toLocaleDateString("en-US", {
@@ -40,11 +41,11 @@ export default function LevelGuess() {
 	const { setCurrentGame } = useContext(GameContext);
 	const { currentUser } = useContext(UserContext);
 	const [sillyMode, setSillyMode] = useState(false);
+	const [normalCompleted, setNormalCompleted] = useState(false);
 	const [sessionId, setSessionId] = useState<string | undefined>(undefined);
 	const [results, setResults] = useState<guesserResultType[]>([]);
 	const [awaitingResponse, setAwaitingResponse] = useState(false);
-	// const [lives, setLives] = useState(10);
-	const game_finished = !!results[0] && results[0].name;
+	const { isOpen, onOpen, onClose } = useDisclosure();
 	const addResult = (new_result: guesserResultType) => {
 		setResults([new_result, ...results]);
 	};
@@ -56,7 +57,11 @@ export default function LevelGuess() {
 	useMemo(() => {
 		if (!!results[0]) {
 			if (results[0].name) {
-				onWin(results);
+				// onWin();
+				onOpen();
+				if (!sillyMode) {
+					setNormalCompleted(true);
+				}
 			}
 		}
 	}, [results]);
@@ -107,6 +112,24 @@ export default function LevelGuess() {
 	return (
 		<>
 			<SillyContext.Provider value={!!sillyMode}>
+				<Modal
+					isOpen={isOpen}
+					onClose={onClose}
+					size="3xl"
+				>
+					<ModalOverlay></ModalOverlay>
+					<ModalContent>
+						<ModalHeader>Game Complete!</ModalHeader>
+						<ModalCloseButton></ModalCloseButton>
+						<GameCompletedScreen
+							setSillyMode={setSillyMode}
+							onClose={() => {
+								setResults([]);
+								onClose();
+							}}
+						></GameCompletedScreen>
+					</ModalContent>
+				</Modal>
 				<VStack
 					width="100%"
 					alignContent="center"
@@ -130,38 +153,20 @@ export default function LevelGuess() {
 								</Box>
 								<Spacer></Spacer>
 
-								<GameModeInfoButton></GameModeInfoButton>
-
-								<Menu>
-									<MenuButton
-										as={Button}
-										rightIcon={<ChevronDownIcon />}
-										isDisabled={awaitingResponse}
-										colorScheme={sillyMode ? "red" : "green"}
+								<GameModeInfoButton
+									disableToolTip={results.length > 0}
+								></GameModeInfoButton>
+								{normalCompleted && (
+									<Button
+										colorScheme={sillyMode ? "green" : "red"}
+										onClick={() => {
+											setResults([]);
+											setSillyMode(!sillyMode);
+										}}
 									>
-										{sillyMode ? "Hard Mode" : "Normal Mode"}
-									</MenuButton>
-									<MenuList>
-										<MenuItem
-											isDisabled={!sillyMode}
-											onClick={() => {
-												setResults([]);
-												setSillyMode(false);
-											}}
-										>
-											Normal Mode
-										</MenuItem>
-										<MenuItem
-											isDisabled={sillyMode}
-											onClick={() => {
-												setResults([]);
-												setSillyMode(true);
-											}}
-										>
-											Hard Mode
-										</MenuItem>
-									</MenuList>
-								</Menu>
+										{sillyMode ? `Play Normal Mode` : `Play Hard Mode`}
+									</Button>
+								)}
 							</HStack>
 							<Divider
 								mb="1em"
@@ -180,7 +185,7 @@ export default function LevelGuess() {
 										>
 											<HStack width="100%">
 												<GuessBox
-													disabled={game_finished}
+													disabled={!!results[0] && results[0].name}
 													loading={awaitingResponse || !currentUser.username}
 													onGuess={onGuess}
 												></GuessBox>

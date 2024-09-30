@@ -86,7 +86,7 @@ exports.userRouter.post("/login", (req, res) => __awaiter(void 0, void 0, void 0
     if (!!token) {
         const user = yield (0, userClient_1.getUserFromToken)(token);
         if (!user) {
-            return res.status(400).send(`Invalid user token ${token}`);
+            return res.status(406).send(`Invalid user token ${token}`);
         }
         const new_token = (0, userClient_1.createUserToken)(user);
         return res.status(200).send({
@@ -124,7 +124,6 @@ exports.userRouter.delete("/", (req, res) => __awaiter(void 0, void 0, void 0, f
         return res.status(200).send("Success");
     }
     catch (err) {
-        console.log(err);
         return res.status(500).send("Couldn't delete user");
     }
 }));

@@ -1,4 +1,4 @@
-import { useContext, useMemo, useState } from "react";
+import { useContext, useMemo } from "react";
 import { GameContext, gameType, UserContext } from "../Neondle";
 import {
 	Box,
@@ -27,7 +27,7 @@ import OptionsPage from "./OptionsPage";
 export default function MainMenu() {
 	const { currentUser } = useContext(UserContext);
 	const { setCurrentGame } = useContext(GameContext);
-	const [awaitingGame, setAwaitingGame] = useState(false);
+
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const todays_date = new Date().toLocaleDateString("en-US", {
 		year: "numeric",
@@ -58,13 +58,7 @@ export default function MainMenu() {
 								<OptionsPage onClose={onClose}></OptionsPage>
 							</>
 						) : (
-							<LoginPage
-								afterLogin={
-									awaitingGame
-										? () => setCurrentGame(gameType.LEVEL_GUESS)
-										: () => {}
-								}
-							></LoginPage>
+							<LoginPage></LoginPage>
 						)}
 					</Box>
 				</ModalContent>
@@ -81,13 +75,14 @@ export default function MainMenu() {
 						<VStack width="100%">
 							<Button
 								width="100%"
+								isDisabled={currentUser.loading}
 								onClick={() => {
-									if (!currentUser.username) {
-										setAwaitingGame(true);
-										onOpen();
-									} else {
-										setCurrentGame(gameType.LEVEL_GUESS);
-									}
+									setCurrentGame(gameType.LEVEL_GUESS);
+									// if (!currentUser.username) {
+									// 	setAwaitingGame(true);
+									// 	onOpen();
+									// } else {
+									// }
 								}}
 								variant="bar"
 								leftIcon={
@@ -129,37 +124,48 @@ export default function MainMenu() {
 							<HStack width="100%">
 								<Text>{todays_date}</Text>
 								<Spacer></Spacer>
-								<Box
-									as={Link}
-									transition="400ms ease"
-									_hover={{
-										bg: "white",
-										textDecoration: "none",
-									}}
-									p="0.25em 0.5em"
-									borderRadius="0.25em"
-									onClick={onOpen}
+								<Tooltip
+									isDisabled={
+										!currentUser.username?.toString().includes("AnonymousNeon")
+									}
+									label="This guest account will be deleted after 24 hours."
 								>
-									<HStack>
-										{currentUser.loading === true ? (
-											<Box>
-												<Spinner></Spinner>
-											</Box>
-										) : (
-											<>
-												<Fade in={true}>
-													<Text>
-														{currentUser.username || `Register / Log In`}
-													</Text>
-												</Fade>
-												<GenericAvatarIcon
-													boxSize="1.5em"
-													color="black"
-												></GenericAvatarIcon>
-											</>
-										)}
-									</HStack>
-								</Box>
+									<Box
+										as={Link}
+										transition="400ms ease"
+										_hover={{
+											bg: "white",
+											textDecoration: "none",
+										}}
+										p="0.25em 0.5em"
+										borderRadius="0.25em"
+										onClick={onOpen}
+									>
+										<HStack>
+											{currentUser.loading === true ? (
+												<Box>
+													<Spinner></Spinner>
+												</Box>
+											) : (
+												<>
+													<Fade in={true}>
+														<Text>
+															{currentUser.username
+																?.toString()
+																.includes("AnonymousNeon")
+																? "Anonymous Neon"
+																: currentUser.username || `Register / Log In`}
+														</Text>
+													</Fade>
+													<GenericAvatarIcon
+														boxSize="1.5em"
+														color="black"
+													></GenericAvatarIcon>
+												</>
+											)}
+										</HStack>
+									</Box>
+								</Tooltip>
 							</HStack>
 						</VStack>
 					</Box>

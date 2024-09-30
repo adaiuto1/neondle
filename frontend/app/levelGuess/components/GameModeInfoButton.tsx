@@ -18,7 +18,11 @@ import {
 	useDisclosure,
 } from "@chakra-ui/react";
 
-export default function GameModeInfoButton() {
+export default function GameModeInfoButton({
+	disableToolTip,
+}: {
+	disableToolTip: boolean;
+}) {
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	// useEffect(() => {
 	// 	if (!has_played_before) {
@@ -29,6 +33,7 @@ export default function GameModeInfoButton() {
 		<>
 			<Tooltip
 				defaultIsOpen
+				isDisabled={disableToolTip}
 				label="Read the Rules!"
 				placement="left"
 				hasArrow

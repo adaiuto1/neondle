@@ -41,3 +41,62 @@ export const onLose = (results: guesserResultType[]) => {
 	if (!!results) {
 	}
 };
+interface dailyResultsResponseType {
+	response?: {
+		normal_results: [];
+		silly_results: [];
+	};
+	error?: {
+		status: number;
+		message: string;
+	};
+}
+export const loadTodaysResults = async (
+	user_id: string
+): Promise<dailyResultsResponseType> => {
+	const { response, error }: dailyResultsResponseType = await axios
+		.get(
+			`${API_URL}/levels/results/postGame?date=${new Date().toLocaleDateString(
+				"en-US"
+			)}&user_id=${user_id}`
+		)
+		.then((response: AxiosResponse) => {
+			const normal_results = response.data.normal_results;
+			const silly_results = response.data.silly_results;
+			return {
+				response: {
+					normal_results: normal_results,
+					silly_results: silly_results,
+				},
+			} as dailyResultsResponseType;
+		})
+		.catch((err: AxiosResponse) => {
+			return {
+				error: { error_code: err.status, error_message: err.data },
+			} as unknown as dailyResultsResponseType;
+		});
+	if (response) return { response };
+	else return { error };
+};
+export const getEmojiScoreboard = (
+	results: guesserResultType[],
+	silly_mode?: boolean
+): string => {
+	const emojiMap = {
+		high: "🟥",
+		low: "🟦",
+		equal: "🟩",
+	};
+	let emojiString = "";
+
+	for (const row of results) {
+		const chapterEmoji = emojiMap[row.chapter];
+		const demonsEmoji = emojiMap[row.demons];
+		const recordTimeEmoji = emojiMap[row.record_time];
+		const recordDateEmoji = emojiMap[row.record_date];
+		emojiString += `${
+			silly_mode ? "" : chapterEmoji
+		} ${demonsEmoji} ${recordTimeEmoji} ${recordDateEmoji}\n`;
+	}
+	return emojiString;
+};

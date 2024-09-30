@@ -7,10 +7,14 @@ import {
 	getTodaysLevelIndex,
 } from "../levelSelector";
 import { decode, sign } from "jsonwebtoken";
-import { jwt_secret } from "../util/prismaClients/userClient";
+import {
+	jwt_secret,
+	purgeStaleAnonymousNeons,
+} from "../util/prismaClients/userClient";
 import { findOrCreateClue } from "../util/prismaClients/gameClient";
 import {
 	findOrCreateSession,
+	getDaysResults,
 	getSessionById,
 	updateGameSession,
 } from "../util/prismaClients/sessionClient";
@@ -32,7 +36,6 @@ levelRouter.get("/start", async (req, res) => {
 	const sillyMode = mode?.toString() === "silly";
 	if (!date) return res.status(400).send("Missing 'time' query param");
 	if (!user_id) return res.status(400).send("No user_id provided");
-
 	try {
 		const todays_level_index = getTodaysLevelIndex(
 			date.toString(),
@@ -47,6 +50,8 @@ levelRouter.get("/start", async (req, res) => {
 			sillyMode
 		);
 		if (!clue) return res.status(500).send("Internal Server Error");
+		purgeStaleAnonymousNeons();
+
 		const session = await findOrCreateSession(user_id?.toString(), clue.id);
 		return res.send({
 			session: {
@@ -93,5 +98,22 @@ levelRouter.post("/guess", async (req, res) => {
 	// }
 	return res.status(200).send(result);
 });
-
+levelRouter.get("/results/postGame", async (req, res) => {
+	try {
+		const { date, user_id } = req.query;
+		if (!date || !user_id) return res.status(400).send("missing params");
+		const { normal_results, silly_results, error } = await getDaysResults(
+			date.toString(),
+			user_id.toString()
+		);
+		if (error) return res.status(500).send("Internal server error");
+		else {
+			return res
+				.status(200)
+				.send({ normal_results: normal_results, silly_results: silly_results });
+		}
+	} catch (err) {
+		return res.send(err);
+	}
+});
 export { levelRouter };

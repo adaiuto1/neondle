@@ -43,7 +43,7 @@ export const makeGuess = async (
 	const guess_target: levelResponseType = await axios
 		.post(`${API_URL}/levels/guess`, {
 			data: {
-				level_name: level_name,
+				level_name: level_name.toLowerCase(),
 			},
 		})
 		.then((x: AxiosResponse) => {

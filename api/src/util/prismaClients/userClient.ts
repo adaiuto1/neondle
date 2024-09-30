@@ -32,6 +32,7 @@ export const registerUser = async (
 		},
 	});
 	if (!new_user) {
+		return { error: { status: 500, message: "Can't register user" } };
 	}
 	const token = sign({ username: username }, jwt_secret, {
 		expiresIn: "7d",
@@ -51,14 +52,14 @@ export const getUserByName = async (
 export const getUserFromToken = async (
 	token: string
 ): Promise<userType | null> => {
-	const { username, exp } = decode(token) as {
-		username: string;
-		exp: number;
-	};
-	if (Date.now() > exp * 1000) {
-		return null;
-	}
 	try {
+		const { username, exp } = decode(token) as {
+			username: string;
+			exp: number;
+		};
+		if (Date.now() > exp * 1000) {
+			return null;
+		}
 		const user = await prisma.user.findFirst({
 			where: {
 				id: username,
@@ -108,5 +109,25 @@ export const deleteUser = async (user_id: string) => {
 		});
 	} catch (err) {
 		console.log(err);
+	}
+};
+export const purgeStaleAnonymousNeons = async () => {
+	const cutoffDate = new Date();
+	cutoffDate.setHours(cutoffDate.getHours() - 24);
+	try {
+		await prisma.user.deleteMany({
+			where: {
+				id: {
+					startsWith: "AnonymousNeon",
+				},
+
+				date_created: {
+					lt: cutoffDate,
+				},
+			},
+		});
+	} catch (err) {
+		console.log(err);
+		console.log("couldnt purge users");
 	}
 };
