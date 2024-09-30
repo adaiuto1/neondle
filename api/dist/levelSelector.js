@@ -46,8 +46,8 @@ const getLevelIndexByName = (level_name) => {
 };
 exports.getLevelIndexByName = getLevelIndexByName;
 const getLevelIdByName = (name) => {
-    if (Object(levelIdMapping_json_1.default).hasOwnProperty(name)) {
-        console.log(Object(levelIdMapping_json_1.default)[name]);
+    if (Object(levelIdMapping_json_1.default).hasOwnProperty(name.toLowerCase().toString())) {
+        console.log(Object(levelIdMapping_json_1.default)[name.toLowerCase().toString()]);
         return Object(levelIdMapping_json_1.default)[name];
     }
     else {

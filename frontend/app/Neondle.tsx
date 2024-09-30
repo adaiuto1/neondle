@@ -2,14 +2,10 @@
 import {
 	Box,
 	Button,
-	Heading,
 	HStack,
-	IconButton,
 	Image,
-	Link,
 	Modal,
 	ModalBody,
-	ModalCloseButton,
 	ModalContent,
 	ModalFooter,
 	ModalHeader,
@@ -26,7 +22,7 @@ import LevelGuess from "./levelGuess/LevelGuess";
 import { currentUserType } from "@/types";
 import { loadCurrentUserFromStorage, login, logout } from "./utils/userClient";
 import LoginPage from "./mainMenu/LoginPage";
-import { ChevronLeftIcon, CloseIcon } from "@chakra-ui/icons";
+import { ChevronLeftIcon } from "@chakra-ui/icons";
 import PlayAsGuestButton from "./user/PlayAsGuestButton";
 export enum gameType {
 	"MAIN_MENU",
@@ -178,7 +174,7 @@ export default function Neondle() {
 											>
 												Back
 											</Button>
-											<PlayAsGuestButton to={currentGame}></PlayAsGuestButton>
+											<PlayAsGuestButton></PlayAsGuestButton>
 											<Spacer></Spacer>
 											<Button
 												size="md"

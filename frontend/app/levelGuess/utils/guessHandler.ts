@@ -17,7 +17,7 @@ export const getResult = async (
 ): Promise<guessResponseType> => {
 	const response: guessResponseType = await axios
 		.post(`${API_URL}/levels/guess?session_id=${session_id}`, {
-			data: { user_id: user_id, level_name: level_name },
+			data: { user_id: user_id, level_name: level_name.toLowerCase() },
 		})
 		.then((x: AxiosResponse) => {
 			return { response: { result: x.data } } as guessResponseType;

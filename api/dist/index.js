@@ -15,7 +15,7 @@ app.use(express_1.default.json());
 const PORT = 8000;
 const corsOption = {
     credentials: true,
-    origin: ["http://localhost:3000", "neondle.vercel.app"], // Specific origin
+    origin: ["http://localhost:3000", "https://neondle.vercel.app"], // Specific origin
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allow specific methods
     allowedHeaders: ["Content-Type", "Authorization"], // Allow specific headers
 };

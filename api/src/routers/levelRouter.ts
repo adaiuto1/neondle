@@ -14,6 +14,7 @@ import {
 import { findOrCreateClue } from "../util/prismaClients/gameClient";
 import {
 	findOrCreateSession,
+	getDaysResults,
 	getSessionById,
 	updateGameSession,
 } from "../util/prismaClients/sessionClient";
@@ -97,5 +98,22 @@ levelRouter.post("/guess", async (req, res) => {
 	// }
 	return res.status(200).send(result);
 });
-
+levelRouter.get("/results/postGame", async (req, res) => {
+	try {
+		const { date, user_id } = req.query;
+		if (!date || !user_id) return res.status(400).send("missing params");
+		const { normal_results, silly_results, error } = await getDaysResults(
+			date.toString(),
+			user_id.toString()
+		);
+		if (error) return res.status(500).send("Internal server error");
+		else {
+			return res
+				.status(200)
+				.send({ normal_results: normal_results, silly_results: silly_results });
+		}
+	} catch (err) {
+		return res.send(err);
+	}
+});
 export { levelRouter };

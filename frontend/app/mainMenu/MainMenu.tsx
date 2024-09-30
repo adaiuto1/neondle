@@ -1,4 +1,4 @@
-import { useContext, useMemo, useState } from "react";
+import { useContext, useMemo } from "react";
 import { GameContext, gameType, UserContext } from "../Neondle";
 import {
 	Box,
@@ -27,7 +27,7 @@ import OptionsPage from "./OptionsPage";
 export default function MainMenu() {
 	const { currentUser } = useContext(UserContext);
 	const { setCurrentGame } = useContext(GameContext);
-	const [awaitingGame, setAwaitingGame] = useState(false);
+
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const todays_date = new Date().toLocaleDateString("en-US", {
 		year: "numeric",

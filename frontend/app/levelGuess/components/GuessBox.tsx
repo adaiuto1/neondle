@@ -40,7 +40,7 @@ export default function GuessBox({
 			<Button
 				disabled={formValue.length <= 1}
 				onClick={() => {
-					onGuess(formValue);
+					onGuess(formValue.toLowerCase());
 					setFormValue("");
 				}}
 				isLoading={loading}

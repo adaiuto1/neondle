@@ -16,6 +16,7 @@ exports.levelRouter = void 0;
 const express_1 = __importDefault(require("express"));
 const googleClient_1 = require("../util/googleClient");
 const levelSelector_1 = require("../levelSelector");
+const userClient_1 = require("../util/prismaClients/userClient");
 const gameClient_1 = require("../util/prismaClients/gameClient");
 const sessionClient_1 = require("../util/prismaClients/sessionClient");
 const guessHandler_1 = require("../util/guessHandler");
@@ -39,6 +40,7 @@ levelRouter.get("/start", (req, res) => __awaiter(void 0, void 0, void 0, functi
         const clue = yield (0, gameClient_1.findOrCreateClue)(JSON.parse(level)[0].name.toLowerCase(), date.toString(), sillyMode);
         if (!clue)
             return res.status(500).send("Internal Server Error");
+        (0, userClient_1.purgeStaleAnonymousNeons)();
         const session = yield (0, sessionClient_1.findOrCreateSession)(user_id === null || user_id === void 0 ? void 0 : user_id.toString(), clue.id);
         return res.send({
             session: Object.assign(Object.assign({}, session), {
@@ -75,4 +77,22 @@ levelRouter.post("/guess", (req, res) => __awaiter(void 0, void 0, void 0, funct
     // updateLeaderboards(user_id, score)
     // }
     return res.status(200).send(result);
+}));
+levelRouter.get("/results/postGame", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { date, user_id } = req.query;
+        if (!date || !user_id)
+            return res.status(400).send("missing params");
+        const { normal_results, silly_results, error } = yield (0, sessionClient_1.getDaysResults)(date.toString(), user_id.toString());
+        if (error)
+            return res.status(500).send("Internal server error");
+        else {
+            return res
+                .status(200)
+                .send({ normal_results: normal_results, silly_results: silly_results });
+        }
+    }
+    catch (err) {
+        return res.send(err);
+    }
 }));

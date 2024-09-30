@@ -110,7 +110,6 @@ userRouter.delete("/", async (req, res) => {
 		await deleteUser(user?.id);
 		return res.status(200).send("Success");
 	} catch (err) {
-		console.log(err);
 		return res.status(500).send("Couldn't delete user");
 	}
 });

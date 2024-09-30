@@ -126,7 +126,7 @@ export const getResult = async (
 	google_client: googleClient
 ): Promise<guesserResultType> => {
 	const session = await getSessionById(session_id);
-	const guessed_level_index = getLevelIndexByName(level_name);
+	const guessed_level_index = getLevelIndexByName(level_name.toLowerCase());
 	const target_level_index = getLevelIndexByName(
 		session?.clue.level_name || ""
 	);

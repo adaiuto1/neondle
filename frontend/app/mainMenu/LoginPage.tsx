@@ -18,7 +18,7 @@ import {
 
 export default function LoginPage({ afterLogin }: { afterLogin?: () => void }) {
 	const toast = useToast();
-	const { currentUser, setCurrentUser } = useContext(UserContext);
+	const { setCurrentUser } = useContext(UserContext);
 	const [action, setAction] = useState<"login" | "register">("login");
 	const [awaitingResponse, setAwaitingResponse] = useState(false);
 	const [formValues, setFormValues] = useState({

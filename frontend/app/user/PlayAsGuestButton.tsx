@@ -1,11 +1,8 @@
 import { Button } from "@chakra-ui/react";
 import { useContext, useState } from "react";
-import { gameType, UserContext } from "../Neondle";
+import { UserContext } from "../Neondle";
 import { getAnonymousNeon } from "../utils/userClient";
 
-interface guestButtonProps {
-	to: gameType;
-}
 export default function PlayAsGuestButton() {
 	const { setCurrentUser } = useContext(UserContext);
 	const [loading, setLoading] = useState(false);
