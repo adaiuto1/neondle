@@ -5,7 +5,7 @@ export const getTodaysLevelIndex = (
 	date_locale_string: string,
 	include_silly: boolean
 ): number => {
-	const num_options = include_silly ? 118 : 87;
+	const num_options = include_silly ? 118 : 86;
 	const bit_array = sjcl.hash.sha256.hash(date_locale_string);
 	const level_index = (Math.abs(bit_array[0]) * 17) % num_options;
 	switch (level_index) {
